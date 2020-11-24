@@ -12,7 +12,7 @@ Deep Codi learns these abnormalities and is able to accurately predict whether a
 
 [x] Check-in 1: [Outline](https://docs.google.com/document/d/1EEI7X_CQr9wfGwV87lb6Td_VjfkSVE8X5ixjkUxLoks/edit?usp=sharing)
 [x] Check-in 1 meet: [11/13](https://brown.zoom.us/j/93398220099) 
-[x] [DevPost](https://devpost.com/software/deep-codi-coronavirus-diagnostic?ref_content=user-portfolio&ref_feature=in_progress)
+[x] [DevPost](https://devpost.com/software/deep-codi-coronavirus-diagnostic?ref_content=user-portfolio&ref_feature=in_progress) [Doc](https://docs.google.com/document/d/1pEfH5XO0vVeSNIsXb7nF0oSin3lQ7R1HJtsL51iGaN0/edit)
 [x] Check-in 2: [Reflection](https://docs.google.com/document/d/1cysJC3PYWxQsm3N-E76wBlRUhUhj_eQgIkaq2fx0ai8/edit?usp=sharing)
 [x] Check-in 2 meet: [11/29](https://brown.zoom.us/j/98971593330) at 2:00pm
 [x] [DevPost:update](https://devpost.com/software/deep-codi-coronavirus-diagnostic#updates)
@@ -33,26 +33,26 @@ The data folder is omitted from the git repo since it is large. For clarity and 
 ```
 |--code
 |--data
-|----main_dataset
-|------test
-|--------covid
-|--------non
-|----------Atelectasis
-|----------Cardiomegaly
-|----------Consolidation
-|----------Edema
-|----------Enlarged_Cardiomediastinum
-|----------Fracture
-|----------Lung_Lesion
-|----------Lung_Opacity
-|----------No_Finding
-|----------Pleural_Other
-|----------Pneumonia
-|----------Pneumothorax
-|----------Support_Devices
-|------train
-|--------covid
-|--------non
+|--main_dataset
+  |--test
+    |--covid
+    |--non
+      |--Atelectasis
+      |--Cardiomegaly
+      |--Consolidation
+      |--Edema
+      |--Enlarged_Cardiomediastinum
+      |--Fracture
+      |--Lung_Lesion
+      |--Lung_Opacity
+      |--No_Finding
+      |--Pleural_Other
+      |--Pneumonia
+      |--Pneumothorax
+      |--Support_Devices
+  |--train
+    |--covid
+    |--non
 ```
 
 Where `main_dataset` has been renamed from the original folder `data_upload_v2`, as additional data sets may be added at a later point.
