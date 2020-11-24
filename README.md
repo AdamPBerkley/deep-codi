@@ -30,6 +30,7 @@ Deep Codi learns these abnormalities and is able to accurately predict whether a
 
 The data folder is omitted from the git repo since it is large. For clarity and consistency, the folder structure is:
 
+```
 |--code
 |--data
 |----main_dataset
@@ -52,6 +53,7 @@ The data folder is omitted from the git repo since it is large. For clarity and 
 |------train
 |--------covid
 |--------non
+```
 
 Where `main_dataset` has been renamed from the original folder `data_upload_v2`, as additional data sets may be added at a later point.
 The `main_dataset` can be found [here](https://github.com/shervinmin/DeepCovid/tree/master/data).
