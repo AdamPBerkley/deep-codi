@@ -29,7 +29,7 @@ def get_data_main(path, imsize=224):
         non_pics = glob.glob(path+"non/*")
     num_pics = len(covid_pics)+len(non_pics)
     data = np.empty((num_pics, imsize, imsize, 3))
-    labels = np.zeros((num_pics))
+    labels = np.zeros((num_pics,2))
     index = 0
     sizes = []
     for pic in covid_pics:
@@ -37,14 +37,14 @@ def get_data_main(path, imsize=224):
         sizes.append(image.size)
         im_data = np.asarray(image)
         data[index] = normalize_image(im_data)
-        labels[index] = 1
+        labels[index,1] = 1
         index += 1
     for pic in non_pics:
         image = Image.open(pic).resize((imsize,imsize)).convert('RGB')
         sizes.append(image.size)
         im_data = np.asarray(image)
         data[index] = normalize_image(im_data)
-        labels[index] = 0
+        labels[index,0] = 1
         index += 1
 
     return data, labels

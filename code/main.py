@@ -17,21 +17,28 @@ def test(model,test_data):
 
 def specificity(test_labels,predictions):
     """
-    returns: float that represents # of correctly predicted non-COVID images over the total number of non-COVID images
+    returns: float 
     """
     neg_y_true = 1 - test_labels
     neg_y_pred = 1 - predictions
+    #Total False Positives: Where Prediction = 1 and Label = 0
     fp = tf.reduce_sum(neg_y_true * predictions)
+    #Total True Negatives: Where Prediction = 0 and Label = 0
     tn = tf.reduce_sum(neg_y_true * neg_y_pred)
     specificity = tn / (tn + fp + 1e-7)
+    
     return specificity
+    
+    
     
 def sensitivity(test_labels,predictions):
     """
-    returns: float that represents # of correctly predicted COVID images over the total number of COVID images
+    returns: float 
     """
     neg_y_pred = 1-predictions
+    #Total False Negatives: Where Prediction = 0 and Label = 1
     fn = tf.reduce_sum(test_labels * neg_y_pred)
+    #Total True Positives: Where Prediction = 1 and Label = 1
     tp = tf.reduce_sum(test_labels * predictions)
     sensitivity = tp / (tp + fn + 1e-7)
     return sensitivity
@@ -52,7 +59,7 @@ def main():
     vgg16 = tf.keras.applications.VGG16(input_shape=shape, include_top=False, weights='imagenet')
     vgg16.trainable=False
     pool_layer = tf.keras.layers.GlobalAveragePooling2D()
-    pred_layer = tf.keras.layers.Dense(1,activation='sigmoid')
+    pred_layer = tf.keras.layers.Dense(2,activation='sigmoid')
     
     model = tf.keras.Sequential([vgg16,pool_layer,pred_layer])
     model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',metrics=[sensitivity,specificity])
