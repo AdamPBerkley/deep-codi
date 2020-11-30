@@ -5,17 +5,15 @@ import os
 
 from preprocess import get_data_main
 from vgg_model import PseudoVGG
-from metrics import dice_coef
+from metrics import dice_coef, specifictiy, sensitivity 
 
 def train(model, train_inputs, train_labels, verbose=False):
     BATCH_SZ = model.batch_size
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     indices = np.arange(train_inputs.shape[0]).tolist()
     random.shuffle(indices)
     loss_list = []
     for i in range(0, train_labels.shape[0], BATCH_SZ):
         images = train_inputs[indices[i:i + BATCH_SZ]]
-        #image = image[:, :, :, np.newaxis]
         labels = tf.gather(train_labels, indices[i:i + BATCH_SZ])
         with tf.GradientTape() as tape:
             logits = model(images)
@@ -24,25 +22,44 @@ def train(model, train_inputs, train_labels, verbose=False):
                 train_dice = dice_coef(labels, logits)
                 print("DICE score on training batch after {} training steps: {}".format(i, train_dice))
 
-        # The keras Model class has the computed property trainable_variables to conveniently
-        # return all the trainable variables you'd want to adjust based on the gradients
         loss_list.append(loss)
         gradients = tape.gradient(loss, model.trainable_variables)
-        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
     return loss_list
 
-def test():
-	pass
+def test(model, test_inputs, test_labels):
+    BATCH_SZ = model.batch_size
+    indices = np.arange(test_inputs.shape[0]).tolist()
+    all_logits = None
+    for i in range(0, test_labels.shape[0], BATCH_SZ):
+        images = test_inputs[indices[i:i + BATCH_SZ]]
+        logits = model(images)
+        if type(all_logits) == type(None):
+        	all_logits = logits
+        else:
+        	all_logits = np.concatenate([all_logits, logits], axis=0)
+    
+    """this should break if the dataset size isnt divisible by the batch size because
+    the for loop it runs the batches on doesnt get predictions for the remainder"""
+
+    dice = dice_coef(test_labels, all_logits)
+    #sensitivity_val = sensitivity(test_labels, all_logits)
+    #specifictiy_val = specifictiy(test_labels, all_logits)
+
+    return dice, sensitivity_val, specifictiy_val
+
 
 def main():
-	path = '../data/main_dataset/'
-	train_data, train_labels = get_data_main(path + 'train/')
-	test_data, test_labels = get_data_main(path + 'test/')
+    path = '../data/main_dataset/'
+    train_data, train_labels = get_data_main(path + 'train/')
+    test_data, test_labels = get_data_main(path + 'test/')
+    
+    model = PseudoVGG()
+    train(model, train_data, train_labels, verbose=True)
+    print(test(model, test_data, test_labels))
 
-	model = PseudoVGG()
-	train(model, train_data, train_labels, verbose=True)
-	
+
 
 if __name__ == '__main__':
-	main()
+    main()
