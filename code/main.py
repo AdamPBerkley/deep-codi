@@ -56,7 +56,7 @@ def main():
     test_data, test_labels = get_data_main(path + 'test/')
     
     model = PseudoVGG()
-    num_epochs = 1
+    num_epochs = 20
     percent = 0
     for epoch in range(num_epochs):
         train(model, train_data, train_labels, verbose=True)
