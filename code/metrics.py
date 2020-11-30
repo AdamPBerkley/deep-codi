@@ -1,7 +1,4 @@
-from keras import backend as K
 import tensorflow as tf
-#import tensorflow.compat.v1 as tf
-#tf.disable_v2_behavior()
 import numpy as np
 import pdb
 import matplotlib.pyplot as plt
@@ -10,9 +7,9 @@ import matplotlib.pyplot as plt
 def dice_coef(y_true, y_pred, smooth=1e-10):
     """ dice_coef =  2*TP/(|pred|+|true|)
     the code below works because labels are one-hot enconded."""
-    y_true_f = K.flatten(K.cast(y_true, 'float32'))
-    y_pred_f = K.flatten(K.cast(y_pred, 'float32'))
-    return (2. * K.sum(y_true_f * y_pred_f)) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    y_true_f = tf.keras.backend.flatten(tf.cast(y_true, 'float32'))
+    y_pred_f = tf.keras.backend.flatten(tf.cast(y_pred, 'float32'))
+    return (2. * tf.reduce_sum(y_true_f * y_pred_f)) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
 
 def specifictiy(y_true, y_pred, smooth=1e-10):
     """TN/(TN+FP)"""
@@ -48,7 +45,7 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
     loss : Tensor
         Weighted crossentropy loss between labels and predictions.
     """
-    y_true_max = K.argmax(y_true, axis=-1)
-    weighted_true = K.gather(weights, y_true_max)
-    loss = K.categorical_crossentropy(y_pred, y_true) * weighted_true
+    y_true_max = tf.argmax(y_true, axis=-1)
+    weighted_true = tf.gather(weights, y_true_max)
+    loss = tf.keras.metrics.categorical_crossentropy(y_pred, y_true) * weighted_true
     return loss 

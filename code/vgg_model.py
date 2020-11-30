@@ -8,35 +8,39 @@ from metrics import dice_coef
 
 class PseudoVGG(tf.keras.Model):
     def __init__(self):
+        super(PseudoVGG, self).__init__()
 
-        super(Model, self).__init__()
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+        self.batch_size = 2
+        kernel_size = 3
         
-        self.conv1_1 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv1_2 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.pool1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(1, 2, 2, 1), padding='SAME')
+        self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv1_2 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.pool1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
         
-        self.conv2_1 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv2_2 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.pool2 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(1, 2, 2, 1), padding='SAME')
+        self.conv2_1 = tf.keras.layers.Conv2D(128,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv2_2 = tf.keras.layers.Conv2D(128,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.pool2 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
         
-        self.conv3_1 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv3_2 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv3_3 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.pool3 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(1, 2, 2, 1), padding='SAME')
+        self.conv3_1 = tf.keras.layers.Conv2D(256,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv3_2 = tf.keras.layers.Conv2D(256,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv3_3 = tf.keras.layers.Conv2D(256,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.pool3 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
             
-        self.conv4_1 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv4_2 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv4_3 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.pool4 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(1, 2, 2, 1), padding='SAME')
+        self.conv4_1 = tf.keras.layers.Conv2D(512,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv4_2 = tf.keras.layers.Conv2D(512,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv4_3 = tf.keras.layers.Conv2D(512,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.pool4 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
             
-        self.conv5_1 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv5_2 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv5_3 = tf.keras.layers.Conv2D(filter,strides,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.pool5 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(1, 2, 2, 1), padding='SAME')
+        self.conv5_1 = tf.keras.layers.Conv2D(512,kernel_size, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv5_2 = tf.keras.layers.Conv2D(512,kernel_size, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv5_3 = tf.keras.layers.Conv2D(512,kernel_size, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.pool5 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
+        self.flatten = tf.keras.layers.Flatten()
             
-        self.dense6 = tf.keras.layers.Dense(size,use_bias=True,activation = 'relu',bias_initializer="zeros")
-        self.dense7 = tf.keras.layers.Dense(size,use_bias=True,activation = 'relu',bias_initializer="zeros")
-        self.dense8 = tf.keras.layers.Dense(size,use_bias=True,activation = None,bias_initializer="zeros")
+        self.dense6 = tf.keras.layers.Dense(4096, use_bias=True, activation='relu', bias_initializer="zeros")
+        self.dense7 = tf.keras.layers.Dense(1000, use_bias=True, activation='relu', bias_initializer="zeros")
+        self.dense8 = tf.keras.layers.Dense(2, use_bias=True, activation=None, bias_initializer="zeros")
     
     def call(self,covid_input):
         conv1_1 = self.conv1_1(covid_input)
@@ -50,28 +54,29 @@ class PseudoVGG(tf.keras.Model):
         conv3_1 = self.conv3_1(pool2)
         conv3_2 = self.conv3_2(conv3_1)
         conv3_2 = self.conv3_2(conv3_2)
-        pool3 = self.pool3(conv3_2)    
+        pool3 = self.pool3(conv3_2)   
 
         conv4_1 = self.conv4_1(pool3)
         conv4_2 = self.conv4_2(conv4_1)
         conv4_2 = self.conv4_2(conv4_2)
-        pool4 = self.pool4(conv4_2)     
+        pool4 = self.pool4(conv4_2)  
 
         conv5_1 = self.conv5_1(pool4)
         conv5_2 = self.conv5_2(conv5_1)
         conv5_3 = self.conv5_3(conv5_2)
-        pool5 = self.pool5(conv3_2)
+        pool5 = self.pool5(conv5_3)
+        flat = self.flatten(pool5)
 
-        dense6 = self.dense6(pool5)
+        dense6 = self.dense6(flat)
         dense7 = self.dense7(dense6)
         dense8 = self.dense8(dense7)
         
-        probs = tf.nn.softmax(dense8)
-        
+        probs = tf.nn.softmax(dense8)        
         return probs
 
-    def loss_function(y_true, y_pred):
+    def loss_function(self, y_true, y_pred):
     	#dice is subtracted because we want it to approach 1.
     	#this wont really optimize for dice because categorical crossentropy >>> dice in magnitude
-    	return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)) - dice_coef(y_true, y_pred)
+    	#crossentropy = tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred, from_logits=True))
+    	return - dice_coef(y_true, y_pred)
 

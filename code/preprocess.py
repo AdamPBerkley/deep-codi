@@ -11,7 +11,7 @@ def normalize_image(image):
 	return image
 
 
-def get_data_main(path, imsize=256):
+def get_data_main(path, imsize=224):
 	"""
 	Given a file path, returns an array of normalized inputs (images) and an array of 
 	one_hot encoded binary labels. 
@@ -28,7 +28,7 @@ def get_data_main(path, imsize=256):
 	else:
 		non_pics = glob.glob(path+"non/*")
 	num_pics = len(covid_pics)+len(non_pics)
-	data = np.empty((num_pics, imsize, imsize))
+	data = np.empty((num_pics, imsize, imsize, 1))
 	labels = np.zeros((num_pics, 2))
 	index = 0
 	sizes = []
@@ -36,14 +36,14 @@ def get_data_main(path, imsize=256):
 		image = Image.open(pic).convert('L').resize((imsize,imsize))
 		sizes.append(image.size)
 		im_data = np.asarray(image)
-		data[index] = normalize_image(im_data)
+		data[index] = np.expand_dims(normalize_image(im_data), -1)
 		labels[index,1] = 1
 		index += 1
 	for pic in non_pics:
 		image = Image.open(pic).convert('L').resize((imsize,imsize))
 		sizes.append(image.size)
 		im_data = np.asarray(image)
-		data[index] = normalize_image(im_data)
+		data[index] = np.expand_dims(normalize_image(im_data), -1)
 		labels[index,0] = 1
 		index += 1
 
