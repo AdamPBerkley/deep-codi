@@ -7,6 +7,23 @@ from preprocess import get_data_main
 from vgg_model import PseudoVGG
 from metrics import dice_coef, specifictiy, sensitivity 
 
+def visualize_loss(losses): 
+    """
+    Uses Matplotlib to visualize the losses of our model.
+    :param losses: list of loss data stored from train. Can use the model's loss_list 
+    field 
+
+    NOTE: DO NOT EDIT
+
+    :return: doesn't return anything, a plot should pop-up 
+    """
+    x = [i for i in range(len(losses))]
+    plt.plot(x, losses)
+    plt.title('Loss per batch')
+    plt.xlabel('Batch')
+    plt.ylabel('Loss')
+    plt.show()  
+
 def train(model, train_inputs, train_labels, verbose=False):
     BATCH_SZ = model.batch_size
     indices = np.arange(train_inputs.shape[0]).tolist()
@@ -56,7 +73,8 @@ def main():
     test_data, test_labels = get_data_main(path + 'test/')
     
     model = PseudoVGG()
-    train(model, train_data, train_labels, verbose=True)
+    losses = train(model, train_data, train_labels, verbose=True)
+    visualize_loss(losses)
     print(test(model, test_data, test_labels))
 
 
