@@ -61,8 +61,8 @@ def test(model, test_inputs, test_labels):
     the for loop it runs the batches on doesnt get predictions for the remainder"""
 
     dice = dice_coef(test_labels, all_logits)
-    #sensitivity_val = sensitivity(test_labels, all_logits)
-    #specifictiy_val = specifictiy(test_labels, all_logits)
+    sensitivity_val = sensitivity(test_labels, all_logits)
+    specifictiy_val = specifictiy(test_labels, all_logits)
 
     return dice, sensitivity_val, specifictiy_val
 

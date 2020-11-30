@@ -13,14 +13,18 @@ def dice_coef(y_true, y_pred, smooth=1e-10):
 
 def specifictiy(y_true, y_pred, smooth=1e-10):
     """TN/(TN+FP)"""
-    true_negatives = tf.keras.metrics.TrueNegatives(y_true, y_pred)
-    false_positives = tf.keras.metrics.FalsePositives(y_true, y_pred)
+    tn_func = tf.keras.metrics.TrueNegatives()
+    fp_func = tf.keras.metrics.FalsePositives()
+    true_negatives = tn_func(y_true, y_pred)
+    false_positives = fp_func(y_true, y_pred)
     return true_negatives/(true_negatives+false_positives+smooth)
 
 def sensitivity(y_true, y_pred, smooth=1e-10):
     """ TP/ (TP +FN)"""
-    true_positives = tf.keras.metrics.TruePositives(y_true, y_pred)
-    false_negatives = tf.keras.metrics.FalseNegatives(y_true, y_pred)
+    tp_func = tf.keras.metrics.TruePositives()
+    fn_func = tf.keras.metrics.FalseNegatives()
+    true_positives = tp_func(y_true, y_pred)
+    false_negatives = fn_func(y_true, y_pred)
     return true_positives/(true_positives+false_negatives+smooth)
 
 def combine_history(history1, history2):
@@ -49,3 +53,11 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
     weighted_true = tf.gather(weights, y_true_max)
     loss = tf.keras.metrics.categorical_crossentropy(y_pred, y_true) * weighted_true
     return loss 
+
+if __name__ == '__main__':
+    true = np.array([[1,0],[0,1]])
+    pred = np.array([[0.9,0.1],[0,1]])
+    print(specifictiy(true, pred))
+    print(sensitivity(true,pred))
+
+
