@@ -11,7 +11,8 @@ class PseudoVGG(tf.keras.Model):
         super(PseudoVGG, self).__init__()
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-        self.batch_size = 2
+        self.bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.batch_size = 10
         kernel_size = 3
         
         self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
@@ -77,6 +78,7 @@ class PseudoVGG(tf.keras.Model):
     def loss_function(self, y_true, y_pred):
     	#dice is subtracted because we want it to approach 1.
     	#this wont really optimize for dice because categorical crossentropy >>> dice in magnitude
-    	#crossentropy = tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred, from_logits=True))
-    	return  - dice_coef(y_true, y_pred)
+    	crossentropy = self.bce(y_true, y_pred)
+    	#tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred, from_logits=True))
+    	return crossentropy - dice_coef(y_true, y_pred)
 

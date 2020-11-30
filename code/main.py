@@ -30,7 +30,7 @@ def train(model, train_inputs, train_labels, verbose=False):
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-    return model.loss_list
+    return loss_list
 
 def test():
 	pass
