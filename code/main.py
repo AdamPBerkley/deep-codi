@@ -75,13 +75,13 @@ def main():
     model = PseudoVGG()
     num_epochs = 20
     percent = 0
+    losses = []
     for epoch in range(num_epochs):
-        train(model, train_data, train_labels, verbose=True)
+        losses.append(train(model, train_data, train_labels, verbose=False))
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
-    losses = train(model, train_data, train_labels, verbose=True)
     visualize_loss(losses)
     print(test(model, test_data, test_labels))
 
