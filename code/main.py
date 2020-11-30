@@ -1,15 +1,17 @@
 import numpy as np
 import tensorflow as tf
+import random
 import os
 
 from preprocess import get_data_main
 from vgg_model import PseudoVGG
+from metrics import dice_coef
 
 def train(model, train_inputs, train_labels, verbose=False):
     BATCH_SZ = model.batch_size
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     indices = np.arange(train_inputs.shape[0]).tolist()
-    #random.shuffle(indices)
+    random.shuffle(indices)
     loss_list = []
     for i in range(0, train_labels.shape[0], BATCH_SZ):
         images = train_inputs[indices[i:i + BATCH_SZ]]
@@ -19,8 +21,8 @@ def train(model, train_inputs, train_labels, verbose=False):
             logits = model(images)
             loss = model.loss_function(labels, logits)
             if i//BATCH_SZ % 4 == 0 and verbose:
-                train_acc = loss
-                print("Accuracy on training set after {} training steps: {}".format(i, train_acc))
+                train_dice = dice_coef(labels, logits)
+                print("DICE score on training batch after {} training steps: {}".format(i, train_dice))
 
         # The keras Model class has the computed property trainable_variables to conveniently
         # return all the trainable variables you'd want to adjust based on the gradients
