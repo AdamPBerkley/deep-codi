@@ -72,19 +72,29 @@ def main():
     path = '../data/main_dataset/'
     train_data, train_labels = get_data_main(path + 'train/')
     test_data, test_labels = get_data_main(path + 'test/')
-    
+
+    # Too much testing non-cov data?
+    # print(train_data.shape[0])
+    # print(train_labels.shape[0])
+    # print(test_data.shape[0])
+    # print(test_labels.shape[0])
     model = PseudoVGG()
-    num_epochs = 5
+    num_epochs = 1
     percent = 0
     losses = []
     for epoch in range(num_epochs):
         losses += train(model, train_data, train_labels)
         curr = int(100* epoch/num_epochs)
-        if (curr> percent):
+        if (curr > percent):
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
+    
     visualize_loss(losses)
-    print(test(model, test_data, test_labels))
+    dice, sensitivity_val, specifictiy_val = test(model, test_data, test_labels)
+    print("Finished testing....")
+    print("Dice: ", dice)
+    print("Sensitivity: ", sensitivity_val)
+    print("Specificity: ", specifictiy_val)
 
 
 
