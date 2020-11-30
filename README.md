@@ -31,8 +31,8 @@ Deep Codi learns these abnormalities and is able to accurately predict whether a
 The data folder is omitted from the git repo since it is large. For clarity and consistency, the folder structure is:
 
 ```
-|--code
-|--data
+|code
+|data
 |--main_dataset
   |--test
     |--covid
