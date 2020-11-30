@@ -5,6 +5,12 @@ import os
 from preprocess import get_data_main
 from PIL import Image
 
+def train():
+	pass
+
+	
+def test():
+	pass
 
 def main():
 	path = '../data/main_dataset/'
