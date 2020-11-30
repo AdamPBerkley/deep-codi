@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 import os
+import matplotlib.pyplot as plt
 
 from preprocess import get_data_main
 from vgg_model import PseudoVGG
@@ -66,14 +67,13 @@ def test(model, test_inputs, test_labels):
 
     return dice
 
-
 def main():
     path = '../data/main_dataset/'
     train_data, train_labels = get_data_main(path + 'train/')
     test_data, test_labels = get_data_main(path + 'test/')
     
     model = PseudoVGG()
-    num_epochs = 20
+    num_epochs = 1
     percent = 0
     losses = []
     for epoch in range(num_epochs):
@@ -84,8 +84,6 @@ def main():
             print("Completion: {0:.0f}%".format(percent))
     visualize_loss(losses)
     print(test(model, test_data, test_labels))
-
-
 
 if __name__ == '__main__':
     main()

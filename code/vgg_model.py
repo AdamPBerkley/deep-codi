@@ -13,6 +13,7 @@ class PseudoVGG(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
         self.bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
         self.batch_size = 10
+        self.leaky = tf.keras.layers.LeakyReLU(alpha = 0.3)
         kernel_size = 3
         
         self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
