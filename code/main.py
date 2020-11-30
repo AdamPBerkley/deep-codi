@@ -54,9 +54,9 @@ def test(model, test_inputs, test_labels):
         images = test_inputs[indices[i:i + BATCH_SZ]]
         logits = model(images)
         if type(all_logits) == type(None):
-        	all_logits = logits
+            all_logits = logits
         else:
-        	all_logits = np.concatenate([all_logits, logits], axis=0)
+            all_logits = np.concatenate([all_logits, logits], axis=0)
     
     """this should break if the dataset size isnt divisible by the batch size because
     the for loop it runs the batches on doesnt get predictions for the remainder"""
