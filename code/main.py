@@ -27,6 +27,8 @@ def visualize_loss(losses):
 
 def train(model, train_inputs, train_labels, verbose=False):
     BATCH_SZ = model.batch_size
+    print(train_inputs)
+    print(train_labels)
     indices = np.arange(train_inputs.shape[0]).tolist()
     random.shuffle(indices)
     loss_list = []
@@ -74,11 +76,12 @@ def main():
     test_data, test_labels = get_data_main(path + 'test/')
     
     model = PseudoVGG()
-    num_epochs = 5
+    num_epochs = 1
     percent = 0
     losses = []
     for epoch in range(num_epochs):
-        losses += train(model, train_data, train_labels)
+        losses += train(model, train_data, train_labels, True)
+        print(losses)
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
