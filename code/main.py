@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 import os
+import matplotlib.pyplot as plt
 
 from preprocess import get_data_main
 from vgg_model import PseudoVGG
