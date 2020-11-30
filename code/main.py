@@ -65,7 +65,7 @@ def test(model, test_inputs, test_labels):
     sensitivity_val = sensitivity(test_labels, all_logits)
     specifictiy_val = specifictiy(test_labels, all_logits)
 
-    return dice
+    return dice, sensitivity_val, specifictiy_val
 
 
 def main():
@@ -78,11 +78,7 @@ def main():
     percent = 0
     losses = []
     for epoch in range(num_epochs):
-<<<<<<< HEAD
         losses += train(model, train_data, train_labels)
-=======
-        losses.append(train(model, train_data, train_labels, verbose=False))
->>>>>>> 4e3f9f8b514dd207a67e392c4a5be090d2854dd3
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
