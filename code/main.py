@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 import os
+import matplotlib.pyplot as plt
 
 from preprocess import get_data_main
 from vgg_model import PseudoVGG
@@ -73,15 +74,15 @@ def main():
     test_data, test_labels = get_data_main(path + 'test/')
     
     model = PseudoVGG()
-    num_epochs = 20
+    num_epochs = 5
     percent = 0
+    losses = []
     for epoch in range(num_epochs):
-        train(model, train_data, train_labels, verbose=True)
+        losses += train(model, train_data, train_labels)
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
-    losses = train(model, train_data, train_labels, verbose=True)
     visualize_loss(losses)
     print(test(model, test_data, test_labels))
 

@@ -1,7 +1,6 @@
 import tensorflow as tf
 import numpy as np
 import pdb
-import matplotlib.pyplot as plt
 
 
 def dice_coef(y_true, y_pred, smooth=1e-10):
