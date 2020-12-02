@@ -80,5 +80,5 @@ class PseudoVGG(tf.keras.Model):
         #this wont really optimize for dice because categorical crossentropy >>> dice in magnitude
         crossentropy = self.bce(y_true, y_pred)
         #tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred, from_logits=True))
-        return crossentropy - dice_coef(y_true, y_pred)
+        return crossentropy #- dice_coef(y_true, y_pred)
 

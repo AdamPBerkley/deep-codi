@@ -65,26 +65,30 @@ def test(model, test_inputs, test_labels):
     sensitivity_val = sensitivity(test_labels, all_logits)
     specifictiy_val = specifictiy(test_labels, all_logits)
 
-    return dice, sensitivity_val, specifictiy_val
+    return dice.numpy(), sensitivity_val.numpy(), specifictiy_val.numpy()
 
 
 def main():
     path = '../data/main_dataset/'
-    train_data, train_labels = get_data_main(path + 'train/')
-    test_data, test_labels = get_data_main(path + 'test/')
+    train_data, train_labels = get_data_main(path + 'train/', imsize=512)
+    test_data, test_labels = get_data_main(path + 'test/', imsize=512)
     
     model = PseudoVGG()
+
+    print(test_labels.shape, test_data.shape)
+    print(train_labels.shape, train_data.shape)
     num_epochs = 1
     percent = 0
     losses = []
     for epoch in range(num_epochs):
-        losses += train(model, train_data, train_labels, True)
+        losses += train(model, test_data, test_labels, True)
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
+    
+    print(test(model, train_data, train_labels))
     visualize_loss(losses)
-    print(test(model, test_data, test_labels))
 
 
 
