@@ -70,7 +70,7 @@ def test(model, test_inputs, test_labels):
 
 def main():
     path = '../data/main_dataset/'
-    train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=6)
+    train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=5)
     test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
     
     model = PseudoVGG()

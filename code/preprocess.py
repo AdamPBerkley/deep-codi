@@ -27,7 +27,6 @@ def get_data_main(path, imsize=224, oversample=1):
 		non_covid_pics = glob.glob(path+"non/**/*")
 	else:
 		non_covid_pics = glob.glob(path+"non/*")
-	print("ratio", len(covid_pics),  len(non_covid_pics))
 	num_pics = len(covid_pics)*oversample+len(non_covid_pics)
 	data = np.empty((num_pics, imsize, imsize, 1))
 	labels = np.zeros((num_pics, 2))

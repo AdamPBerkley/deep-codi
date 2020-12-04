@@ -13,8 +13,8 @@ class PseudoVGG(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
         self.bce = tf.keras.losses.BinaryCrossentropy()
         self.cce = tf.keras.losses.CategoricalCrossentropy()
-        self.batch_size = 10
-        kernel_size = 3
+        self.batch_size = 100
+        kernel_size = 6
         
         self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
         self.conv1_2 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
@@ -77,6 +77,9 @@ class PseudoVGG(tf.keras.Model):
         return probs
 
     def loss_function(self, y_true, y_pred):
-        crossentropy = self.cce(y_true, y_pred)
-        return crossentropy #- dice_coef(y_true, y_pred)
+        """self.bce is binary crossentropy while self.cce is categorical crossentropy
+        used both loss types because I've been switching between them to try and improve
+        the model"""
+        crossentropy = self.bce(y_true, y_pred)
+        return crossentropy - dice_coef(y_true, y_pred)
 
