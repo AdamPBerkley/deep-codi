@@ -20,7 +20,9 @@ def specificity(y_true, y_pred):
 
     # n = tf.keras.metrics.TrueNegatives(threshold)
     # n.update_state(y_true,y_pred)
-    # tn = m.result().numpy()   
+    # tn = m.result().numpy()
+    y_true = tf.argmax(y_true, axis=-1)
+    y_pred = tf.argmax(y_pred, axis=-1)
     tn = tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1)))
     fp = tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1)))
     
@@ -39,6 +41,8 @@ def sensitivity(y_true, y_pred):
     # n = tf.keras.metrics.TruePositives(threshold)
     # n.update_state(y_true,y_pred)
     # tp = m.result().numpy()
+    y_true = tf.argmax(y_true, axis=-1)
+    y_pred = tf.argmax(y_pred, axis=-1)
     tp = tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1)))
     fn = tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1)))
 

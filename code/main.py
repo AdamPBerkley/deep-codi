@@ -109,7 +109,7 @@ def main():
             print("Completion: {0:.0f}%".format(percent))
     
     print(test(model, test_data, test_labels))
-    #visualize_loss(losses)
+    visualize_loss(losses)
 
 
 
