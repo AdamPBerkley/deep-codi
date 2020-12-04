@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from metrics import dice_coef
+from metrics import dice_coef, sensitivity
 
 #Layers based on VGG structure
 #Filters/biases in VGG come from Numpy file
@@ -11,7 +11,8 @@ class PseudoVGG(tf.keras.Model):
         super(PseudoVGG, self).__init__()
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-        self.bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cce = tf.keras.losses.CategoricalCrossentropy()
         self.batch_size = 10
         kernel_size = 3
         
@@ -76,9 +77,6 @@ class PseudoVGG(tf.keras.Model):
         return probs
 
     def loss_function(self, y_true, y_pred):
-        #dice is subtracted because we want it to approach 1.
-        #this wont really optimize for dice because categorical crossentropy >>> dice in magnitude
-        crossentropy = self.bce(y_true, y_pred)
-        #tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred, from_logits=True))
+        crossentropy = self.cce(y_true, y_pred)
         return crossentropy #- dice_coef(y_true, y_pred)
 

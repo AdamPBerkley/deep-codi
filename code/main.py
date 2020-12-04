@@ -70,25 +70,25 @@ def test(model, test_inputs, test_labels):
 
 def main():
     path = '../data/main_dataset/'
-    train_data, train_labels = get_data_main(path + 'train/', imsize=512)
-    test_data, test_labels = get_data_main(path + 'test/', imsize=512)
+    train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=6)
+    test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
     
     model = PseudoVGG()
 
     print(test_labels.shape, test_data.shape)
     print(train_labels.shape, train_data.shape)
-    num_epochs = 1
+    num_epochs = 5
     percent = 0
     losses = []
     for epoch in range(num_epochs):
-        losses += train(model, test_data, test_labels, True)
+        losses += train(model, train_data, train_labels, True)
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
     
-    print(test(model, train_data, train_labels))
-    visualize_loss(losses)
+    print(test(model, test_data, test_labels))
+    #visualize_loss(losses)
 
 
 
