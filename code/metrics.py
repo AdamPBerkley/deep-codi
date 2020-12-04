@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import pdb
+
 
 
 def dice_coef(y_true, y_pred, smooth=1e-10):
@@ -10,7 +10,43 @@ def dice_coef(y_true, y_pred, smooth=1e-10):
     y_pred_f = tf.keras.backend.flatten(tf.cast(y_pred, 'float32'))
     return (2. * tf.reduce_sum(y_true_f * y_pred_f)) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
 
-def specifictiy(y_true, y_pred, smooth=1e-10):
+def specificity(y_true, y_pred):
+    """
+    returns: float 
+    """
+    # m = tf.keras.metrics.FalsePositives(threshold)
+    # m.update_state(y_true,y_pred)
+    # fp = m.result().numpy()
+
+    # n = tf.keras.metrics.TrueNegatives(threshold)
+    # n.update_state(y_true,y_pred)
+    # tn = m.result().numpy()   
+    tn = tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1)))
+    fp = tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1)))
+    
+    specificity = tn / (fp + tn + 1e-7)
+    
+    return specificity
+    
+def sensitivity(y_true, y_pred):
+    """
+    returns: float 
+    """
+    # m = tf.keras.metrics.FalseNegatives(threshold)
+    # m.update_state(y_true,y_pred)
+    # fn = m.result().numpy()
+
+    # n = tf.keras.metrics.TruePositives(threshold)
+    # n.update_state(y_true,y_pred)
+    # tp = m.result().numpy()
+    tp = tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1)))
+    fn = tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1)))
+
+    sensitivity = tp / (fn + tp + 1e-7)
+    
+    return sensitivity
+
+def specifictiy_old(y_true, y_pred, smooth=1e-10):
     """TN/(TN+FP)"""
     tn_func = tf.keras.metrics.TrueNegatives()
     fp_func = tf.keras.metrics.FalsePositives()
@@ -20,7 +56,7 @@ def specifictiy(y_true, y_pred, smooth=1e-10):
     false_positives = fp_func(y_true, y_pred)
     return true_negatives/(true_negatives+false_positives+smooth)
 
-def sensitivity(y_true, y_pred, smooth=1e-10):
+def sensitivity_old(y_true, y_pred, smooth=1e-10):
     """ TP/ (TP +FN)"""
     tp_func = tf.keras.metrics.TruePositives()
     fn_func = tf.keras.metrics.FalseNegatives()
@@ -30,11 +66,6 @@ def sensitivity(y_true, y_pred, smooth=1e-10):
     false_negatives = fn_func(y_true, y_pred)
     return true_positives/(true_positives+false_negatives+smooth)
 
-def combine_history(history1, history2):
-    history = history1
-    for key in history1.history:
-        history.history[key] = history1.history[key] + history2.history[key]
-    return history
 
 def w_categorical_crossentropy(y_true, y_pred, weights):
     """https://www.programcreek.com/python/example/93764/keras.backend.categorical_crossentropy

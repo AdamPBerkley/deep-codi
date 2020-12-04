@@ -13,7 +13,7 @@ class PseudoVGG(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
         self.bce = tf.keras.losses.BinaryCrossentropy()
         self.cce = tf.keras.losses.CategoricalCrossentropy()
-        self.batch_size = 100
+        self.batch_size = 32
         kernel_size = 6
         
         self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")

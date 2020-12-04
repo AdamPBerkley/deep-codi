@@ -4,9 +4,9 @@ import random
 import os
 import matplotlib.pyplot as plt
 
-from preprocess import get_data_main
+from preprocess import get_data_main, get_balanced_data
 from vgg_model import PseudoVGG
-from metrics import dice_coef, specifictiy, sensitivity 
+from metrics import dice_coef, specificity, sensitivity 
 
 def visualize_loss(losses): 
     """
@@ -23,9 +23,30 @@ def visualize_loss(losses):
     plt.title('Loss per batch')
     plt.xlabel('Batch')
     plt.ylabel('Loss')
-    plt.show()  
+    plt.show()
 
-def train(model, train_inputs, train_labels, verbose=False):
+def train(model, generator, verbose=False):
+    BATCH_SZ = model.batch_size
+    train_steps = generator.steps_per_epoch
+    loss_list = []
+    for i in range(0, train_steps, 1):
+        images, labels = generator[i]
+        with tf.GradientTape() as tape:
+            logits = model(images)
+            loss = model.loss_function(labels, logits)
+            if i//BATCH_SZ % 4 == 0 and verbose:
+                train_dice = dice_coef(labels, logits)
+                print("DICE score on training batch after {} training steps: {}".format(i, train_dice))
+
+        loss_list.append(loss)
+        gradients = tape.gradient(loss, model.trainable_variables)
+        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+    return loss_list
+
+def train_old(model, train_inputs, train_labels, verbose=False):
+    """uses old method of balancing the dataset.  newer version uses keras
+    builtin code to balance the dataset and generate batches"""
     BATCH_SZ = model.batch_size
     indices = np.arange(train_inputs.shape[0]).tolist()
     random.shuffle(indices)
@@ -68,20 +89,20 @@ def test(model, test_inputs, test_labels):
     return dice.numpy(), sensitivity_val.numpy(), specifictiy_val.numpy()
 
 
-def main():
-    path = '../data/main_dataset/'
-    train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=5)
-    test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
-    
+def main():    
     model = PseudoVGG()
 
-    print(test_labels.shape, test_data.shape)
-    print(train_labels.shape, train_data.shape)
+    path = '../data/main_dataset/'
+    #train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=5)#~7 for even
+    train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size)
+    test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
+
     num_epochs = 5
     percent = 0
     losses = []
     for epoch in range(num_epochs):
-        losses += train(model, train_data, train_labels, True)
+        #losses += train_old(model, train_data, train_labels, True)
+        losses = train(model, train_generator, True)
         curr = int(100* epoch/num_epochs)
         if (curr> percent):
             percent = curr
