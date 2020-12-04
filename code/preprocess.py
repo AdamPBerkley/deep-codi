@@ -22,11 +22,11 @@ def get_data_main(path, imsize=224):
     image for the dataset. uses Pillow for automatic scaling to correct size 
     :return:NumPy array of normalized inputs of labels, where 
     inputs are black and white (one channel) and of size imsize x imsize    """
-    covid_pics = glob.glob(path+"covid/*")
+    covid_pics = glob.glob(path+"1_covid/*")
     if 'test' in path:
-        non_pics = glob.glob(path+"non/**/*")
+        non_pics = glob.glob(path+"0_non/**/*")
     else:
-        non_pics = glob.glob(path+"non/*")
+        non_pics = glob.glob(path+"0_non/*")
     num_pics = len(covid_pics)+len(non_pics)
     data = np.empty((num_pics, imsize, imsize, 3))
     labels = np.zeros((num_pics))

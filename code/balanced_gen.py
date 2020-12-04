@@ -17,7 +17,6 @@ class BalancedDataGenerator(Sequence):
         datagen.fit(x)
         self.gen, self.steps_per_epoch = balanced_batch_generator(x.reshape(x.shape[0], -1), y, sampler=RandomOverSampler(), batch_size=self.batch_size, keep_sparse=True)
         self._shape = (self.steps_per_epoch * batch_size, *x.shape[1:])
-        
     def __len__(self):
         return self.steps_per_epoch
 
