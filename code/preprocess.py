@@ -21,9 +21,7 @@ def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
         shear_range=0.1,
         brightness_range=[0.5, 1.25],
         preprocessing_function=normalize_image if color == 'L' else tf.keras.applications.vgg16.preprocess_input
-        #tf.keras.applications.vgg16.preprocess_input
-        #^^ will work if we convert to RBG instead of L in get_data_main
-        )
+    )
         
     seed = 1
 

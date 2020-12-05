@@ -14,6 +14,7 @@ class PseudoVGG(tf.keras.Model):
         self.bce = tf.keras.losses.BinaryCrossentropy()
         self.cce = tf.keras.losses.CategoricalCrossentropy()
         self.batch_size = 32
+        self.epochs = 5
         self.color = 'RGB' #should be 'RGB' or 'L'
         kernel_size = 6
         

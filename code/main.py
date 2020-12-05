@@ -44,29 +44,6 @@ def train(model, generator, verbose=False):
 
     return loss_list
 
-def train_old(model, train_inputs, train_labels, verbose=False):
-    """uses old method of balancing the dataset.  newer version uses keras
-    builtin code to balance the dataset and generate batches"""
-    BATCH_SZ = model.batch_size
-    indices = np.arange(train_inputs.shape[0]).tolist()
-    random.shuffle(indices)
-    loss_list = []
-    for i in range(0, train_labels.shape[0], BATCH_SZ):
-        images = train_inputs[indices[i:i + BATCH_SZ]]
-        labels = tf.gather(train_labels, indices[i:i + BATCH_SZ])
-        with tf.GradientTape() as tape:
-            logits = model(images)
-            loss = model.loss_function(labels, logits)
-            if i//BATCH_SZ % 4 == 0 and verbose:
-                train_dice = dice_coef(labels, logits)
-                print("DICE score on training batch after {} training steps: {}".format(i, train_dice))
-
-        loss_list.append(loss)
-        gradients = tape.gradient(loss, model.trainable_variables)
-        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-
-    return loss_list
-
 def test(model, test_inputs, test_labels):
     BATCH_SZ = model.batch_size
     indices = np.arange(test_inputs.shape[0]).tolist()
@@ -97,7 +74,7 @@ def main():
     train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size, color=model.color)
     test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
 
-    num_epochs = 5
+    num_epochs = model.epochs
     percent = 0
     losses = []
     for epoch in range(num_epochs):

@@ -50,27 +50,6 @@ def sensitivity(y_true, y_pred):
     
     return sensitivity
 
-def specifictiy_old(y_true, y_pred, smooth=1e-10):
-    """TN/(TN+FP)"""
-    tn_func = tf.keras.metrics.TrueNegatives()
-    fp_func = tf.keras.metrics.FalsePositives()
-    y_true = tf.argmax(y_true, axis=-1)
-    y_pred = tf.argmax(y_pred, axis=-1)
-    true_negatives = tn_func(y_true, y_pred)
-    false_positives = fp_func(y_true, y_pred)
-    return true_negatives/(true_negatives+false_positives+smooth)
-
-def sensitivity_old(y_true, y_pred, smooth=1e-10):
-    """ TP/ (TP +FN)"""
-    tp_func = tf.keras.metrics.TruePositives()
-    fn_func = tf.keras.metrics.FalseNegatives()
-    y_true = tf.argmax(y_true, axis=-1)
-    y_pred = tf.argmax(y_pred, axis=-1)
-    true_positives = tp_func(y_true, y_pred)
-    false_negatives = fn_func(y_true, y_pred)
-    return true_positives/(true_positives+false_negatives+smooth)
-
-
 def w_categorical_crossentropy(y_true, y_pred, weights):
     """https://www.programcreek.com/python/example/93764/keras.backend.categorical_crossentropy
     Keras-style categorical crossentropy loss function, with weighting for each class.
