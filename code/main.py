@@ -4,6 +4,9 @@ import os
 import pandas as pd
 
 from balanced_gen import BalancedDataGenerator
+from metrics import sensitivity
+from metrics import specificity
+from metrics import dice_coef
 
 from preprocess import get_data_main
 from PIL import Image
@@ -68,7 +71,7 @@ def train(model,train_data,train_labels,val_path):
     print(results)
     
 def test(model,test_path):
-
+    seed = 1
     #Create Test Generator
     testing_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         preprocessing_function=tf.keras.applications.vgg16.preprocess_input
@@ -86,43 +89,10 @@ def test(model,test_path):
     model.evaluate_generator(testing_generator,
     steps=test_steps,
     verbose=1)        
-def specificity(y_true,y_pred):
-    """
-    returns: float 
-    """
-    # m = tf.keras.metrics.FalsePositives(threshold)
-    # m.update_state(y_true,y_pred)
-    # fp = m.result().numpy()
 
-    # n = tf.keras.metrics.TrueNegatives(threshold)
-    # n.update_state(y_true,y_pred)
-    # tn = m.result().numpy()   
-    tn = tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1)))
-    fp = tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1)))
-    
-    specificity = tn / (fp + 1e-7)
-    
-    return specificity
     
     
-    
-def sensitivity(y_true,y_pred):
-    """
-    returns: float 
-    """
-    # m = tf.keras.metrics.FalseNegatives(threshold)
-    # m.update_state(y_true,y_pred)
-    # fn = m.result().numpy()
-
-    # n = tf.keras.metrics.TruePositives(threshold)
-    # n.update_state(y_true,y_pred)
-    # tp = m.result().numpy()
-    tp = tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1)))
-    fn = tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1)))
-
-    sensitivity = tp / (fn + 1e-7)
-    
-    return sensitivity
+  
     
 def main():
     train_path = '../data/main_dataset/train/'
@@ -134,7 +104,6 @@ def main():
     train_data, train_labels = get_data_main(train_path)
     
  
-    #print(testing_generator.filenames)
     print("Generating the model...")
     shape = (224, 224, 3)
     vgg16 = tf.keras.applications.VGG16(input_shape=shape, include_top=False, weights='imagenet')
@@ -147,7 +116,7 @@ def main():
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dropout(0.5))
     model.add(tf.keras.layers.Dense(1,activation = 'sigmoid'))
-    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity])
+    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,dice_coef])
     model.summary()
     
     
