@@ -94,7 +94,7 @@ def main():
 
     path = '../data/main_dataset/'
     #train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=5)#~7 for even
-    train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size)
+    train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size, color=model.color)
     test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
 
     num_epochs = 5

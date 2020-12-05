@@ -12,15 +12,15 @@ def normalize_image(image):
     return image
 
 
-def get_balanced_data(path, imsize=224, batch_size=32):
-    inputs, labels =  get_data_main(path, imsize=imsize)
+def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
+    inputs, labels =  get_data_main(path, imsize=imsize, color=color)
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rotation_range=15,
         width_shift_range=0.1,
         height_shift_range=0.1,
         shear_range=0.1,
         brightness_range=[0.5, 1.25],
-        preprocessing_function=normalize_image
+        preprocessing_function=normalize_image if color == 'L' else tf.keras.applications.vgg16.preprocess_input
         #tf.keras.applications.vgg16.preprocess_input
         #^^ will work if we convert to RBG instead of L in get_data_main
         )
@@ -33,7 +33,7 @@ def get_balanced_data(path, imsize=224, batch_size=32):
     return balanced_gen
 
 
-def get_data_main(path, imsize=224, oversample=1):
+def get_data_main(path, imsize=224, oversample=1, color='L'):
     """
     Given a file path, returns an array of normalized inputs (images) and an array of 
     one_hot encoded binary labels. 
@@ -50,23 +50,29 @@ def get_data_main(path, imsize=224, oversample=1):
     else:
         non_covid_pics = glob.glob(path+"non/*")
     num_pics = len(covid_pics)*oversample+len(non_covid_pics)
-    data = np.empty((num_pics, imsize, imsize, 1))
+    if color == 'L':
+        data = np.empty((num_pics, imsize, imsize, 1))
+    else:
+        data = np.empty((num_pics, imsize, imsize, 3))
     labels = np.zeros((num_pics, 2))
     index = 0
-    sizes = []
     for i in range(oversample):
         for pic in covid_pics:
-            image = Image.open(pic).convert('L').resize((imsize,imsize))
-            sizes.append(image.size)
+            image = Image.open(pic).resize((imsize,imsize)).convert(color)
             im_data = np.asarray(image)
-            data[index] = np.expand_dims(normalize_image(im_data), -1)
+            if color == 'L':
+                data[index] = np.expand_dims(normalize_image(im_data), -1)
+            else:
+                data[index] = normalize_image(im_data)
             labels[index,1] = 1
             index += 1
     for pic in non_covid_pics:
-        image = Image.open(pic).convert('L').resize((imsize,imsize))
-        sizes.append(image.size)
+        image = Image.open(pic).resize((imsize,imsize)).convert(color)
         im_data = np.asarray(image)
-        data[index] = np.expand_dims(normalize_image(im_data), -1)
+        if color == 'L':
+            data[index] = np.expand_dims(normalize_image(im_data), -1)
+        else:
+            data[index] = normalize_image(im_data)
         labels[index,0] = 1
         index += 1
 
