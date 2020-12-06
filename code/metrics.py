@@ -23,8 +23,8 @@ def specificity(y_true, y_pred):
     # tn = m.result().numpy()
     y_true = tf.argmax(y_true, axis=-1)
     y_pred = tf.argmax(y_pred, axis=-1)
-    true_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1))), tf.float64)
-    possible_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1))), tf.float64)
+    true_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1))), tf.float32)
+    possible_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1))), tf.float32)
     
     specificity = true_negatives / (possible_negatives + 1.0e-7)
     
@@ -43,10 +43,8 @@ def sensitivity(y_true, y_pred):
     # tp = m.result().numpy()
     y_true = tf.argmax(y_true, axis=-1)
     y_pred = tf.argmax(y_pred, axis=-1)
-    true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float64)
-    possible_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float64)
-    print(true_positives)
-    print(possible_positives)
+    true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
+    possible_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
 
     sensitivity = true_positives / (possible_positives + 1.0e-7)
     
