@@ -13,6 +13,22 @@ def normalize_image(image):
 
 
 def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
+    """
+    :param path: String
+        relative path to the data folder something 
+        like '../data/main_dataset/train/'
+    :param imsize: Integer
+        size of input image - image comes out as (imsize x imsize x channels)
+    :param batch_size: Integer
+        number of images in each batch
+    :param color: Stinge of values 'L' or 'RGB'
+        color type of input image. L is black and white with 1 channel 
+        and 'RGB' is color with 3 channels
+    :return: BalancedDataGenerator
+        a datagenerator which runs preprocessing and returns batches accessed
+        by integers indexing (i.e. generator[0] returns the first batch of inputs 
+        and labels)
+    """
     inputs, labels =  get_data_main(path, imsize=imsize, color=color)
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rotation_range=15,
@@ -36,12 +52,20 @@ def get_data_main(path, imsize=224, oversample=1, color='L'):
     Given a file path, returns an array of normalized inputs (images) and an array of 
     one_hot encoded binary labels. 
 
-    :param path: file path for inputs and labels, something 
-    like '../data/main_dataset/train/'
-    :param imsie:  an integer  representing how many pixels you want in your 
-    image for the dataset. uses Pillow for automatic scaling to correct size 
-    :return:NumPy array of normalized inputs of labels, where 
-    inputs are black and white (one channel) and of size imsize x imsize    """
+    :param path: String
+        relative path to the data folder something 
+        like '../data/main_dataset/train/'
+    :param imsize: Integer
+        size of input image - image comes out as (imsize x imsize x channels)
+    :param batch_size: Integer
+        number of images in each batch
+    :param color: Stinge of values 'L' or 'RGB'
+        color type of input image. L is black and white with 1 channel 
+        and 'RGB' is color with 3 channels
+    :return: Numpy Array, Numpy Array
+        a array containing the input images of desired size and type and 
+        an array containing the labels one-hot encoded
+     """
     covid_pics = glob.glob(path+"covid/*")
     if 'test' in path:
         non_covid_pics = glob.glob(path+"non/**/*")

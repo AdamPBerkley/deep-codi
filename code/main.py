@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from preprocess import get_data_main, get_balanced_data
 from vgg_model import PseudoVGG
-from metrics import dice_coef, specificity, sensitivity 
+from metrics import dice_coef, specificity, sensitivity, precision
 
 def visualize_loss(losses): 
     """
@@ -26,6 +26,19 @@ def visualize_loss(losses):
     plt.show()
 
 def train(model, generator, verbose=False):
+    """trains the model for one epoch
+
+    :param model: tf.keras.Model inherited data type
+        model being trained 
+    :param generator: BalancedDataGenerator
+        a datagenerator which runs preprocessing and returns batches accessed
+        by integers indexing (i.e. generator[0] returns the first batch of inputs 
+        and labels)
+    :param verbose: boolean
+        whether to output the dice score every batch
+    :return: list
+        list of losses from every batch of training
+    """
     BATCH_SZ = model.batch_size
     train_steps = generator.steps_per_epoch
     loss_list = []
@@ -45,6 +58,17 @@ def train(model, generator, verbose=False):
     return loss_list
 
 def test(model, test_inputs, test_labels):
+    """
+    :param model: tf.keras.Model inherited data type
+        model being trained  
+    :param test_input: Numpy Array - shape (num_images, imsize, imsize, channels)
+        input images to test on
+    :param test_labels: Numpy Array - shape (num_images, 2)
+        ground truth labels one-hot encoded
+    :return: float, float, float, float 
+        returns dice score, sensitivity value, specificity value, 
+        and precision value all of which are in the range [0,1]
+    """
     BATCH_SZ = model.batch_size
     indices = np.arange(test_inputs.shape[0]).tolist()
     all_logits = None
@@ -63,7 +87,7 @@ def test(model, test_inputs, test_labels):
     sensitivity_val = sensitivity(test_labels, all_logits)
     specificity_val = specificity(test_labels, all_logits)
 
-    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy()
+    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy(), precision(test_labels, all_logits).numpy()
 
 
 def main():    

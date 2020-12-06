@@ -4,15 +4,29 @@ import numpy as np
 
 
 def dice_coef(y_true, y_pred, smooth=1e-10):
-    """ dice_coef =  2*TP/(|pred|+|true|)
-    the code below works because labels are one-hot enconded."""
+    """
+    dice_coef =  2*TP/(|pred|+|true|)
+    the code below works because labels are one-hot enconded.
+
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction value probabilities 
+    :return: Tensor - single float value in range [0,1]
+        Sorensen-Dice coefficient which is equal to F_1 score for binary classifications
+    """
     y_true_f = tf.keras.backend.flatten(tf.cast(y_true, 'float32'))
     y_pred_f = tf.keras.backend.flatten(tf.cast(y_pred, 'float32'))
     return (2. * tf.reduce_sum(y_true_f * y_pred_f)) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
 
 def specificity(y_true, y_pred):
     """
-    returns: float 
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction value probabilities 
+    :return: Tensor - single float value in range [0,1]
+        specificity value TN/(TN+FP)
     """
     # m = tf.keras.metrics.FalsePositives(threshold)
     # m.update_state(y_true,y_pred)
@@ -29,10 +43,32 @@ def specificity(y_true, y_pred):
     specificity = true_negatives / (possible_negatives + 1.0e-7)
     
     return specificity
+
+
+def precision(y_true, y_pred):
+    """
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction value probabilities 
+    :return: Tensor - single float value in range [0,1]
+        precision value TP/(TP+FP)
+    """
+    y_true = tf.argmax(y_true, axis=-1)
+    y_pred = tf.argmax(y_pred, axis=-1)
+    tp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
+    prp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
+    precision = tp / (prp + 1e-7)
+    return precision
     
 def sensitivity(y_true, y_pred):
     """
-    returns: float 
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction value probabilities 
+    :return: Tensor - single float value in range [0,1]
+        sensitivity value TP/(TP+FN)
     """
     # m = tf.keras.metrics.FalseNegatives(threshold)
     # m.update_state(y_true,y_pred)
@@ -56,9 +92,9 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
     Parameters
     ----------
     y_true : Tensor
-        Truth labels.
+        Truth labels one hot encoded
     y_pred : Tensor
-        Predicted values.
+        Predicted values one hot encoded
     weights: Tensor
         Multiplicative factor for loss per class.
     Returns
