@@ -10,7 +10,7 @@ class PseudoVGG(tf.keras.Model):
     def __init__(self):
         super(PseudoVGG, self).__init__()
 
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
         self.bce = tf.keras.losses.BinaryCrossentropy()
         self.cce = tf.keras.losses.CategoricalCrossentropy()
         self.batch_size = 32

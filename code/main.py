@@ -61,9 +61,9 @@ def test(model, test_inputs, test_labels):
 
     dice = dice_coef(test_labels, all_logits)
     sensitivity_val = sensitivity(test_labels, all_logits)
-    specifictiy_val = specifictiy(test_labels, all_logits)
+    specificity_val = specificity(test_labels, all_logits)
 
-    return dice.numpy(), sensitivity_val.numpy(), specifictiy_val.numpy()
+    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy()
 
 
 def main():    
@@ -72,7 +72,7 @@ def main():
     path = '../data/main_dataset/'
     #train_data, train_labels = get_data_main(path + 'train/', imsize=224, oversample=5)#~7 for even
     train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size, color=model.color)
-    test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1 )#30 for even
+    test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1, color=model.color)#30 for even
 
     num_epochs = model.epochs
     percent = 0
