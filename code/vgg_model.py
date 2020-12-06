@@ -49,8 +49,10 @@ class PseudoVGG(tf.keras.Model):
     
     def call(self, covid_input):
         """
-        :param path:  
-        :return:
+        :param covid_inputs: Tensor or Numpy Array
+            input images all of shape (batch_size, imsize, imsize, channels)
+        :return: Tensor
+            prediction values of chape (batch_size, 2)
         """
         conv1_1 = self.conv1_1(covid_input)
         conv1_2 = self.conv1_2(conv1_1)
@@ -85,8 +87,12 @@ class PseudoVGG(tf.keras.Model):
 
     def loss_function(self, y_true, y_pred):
         """
-        :param path:  
-        :return:
+        :param y_true:Tensor - shape (batch_size, 2)
+            Truth labels one hot encoded
+        :param y_pred:Tensor - shape (batch_size, 2)
+            prediction value probabilities 
+        :return: Tensor - single float value 
+            binary crossentropy 
         """
         crossentropy = tf.math.reduce_sum(tf.keras.losses.binary_crossentropy(y_true, y_pred))
         #tf.keras.losses.binary_crossentropy(y_true, y_pred)
