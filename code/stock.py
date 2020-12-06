@@ -84,14 +84,9 @@ def main():
  
     print("Generating the model...")
     shape = (224, 224, 3)
-    vgg16 = tf.keras.applications.VGG16(input_shape=shape, include_top=False, weights='imagenet')
-    vgg16.trainable=False
+    model = tf.keras.applications.VGG16(input_shape=shape, include_top=True, weights='imagenet')
+    model.trainable=False
     
-    model = tf.keras.Sequential()
-    model.add(vgg16)
-    model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dropout(0.3))
-    model.add(tf.keras.layers.Dense(1,activation = 'sigmoid'))
     model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
     model.summary()
     

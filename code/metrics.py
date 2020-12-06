@@ -45,7 +45,13 @@ def sensitivity(y_true,y_pred):
     sensitivity = tp / (pp + 1e-7)
     
     return sensitivity
-
+    
+def precision(y_true, y_pred):
+    tp = tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1)))
+    prp = tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1)))
+    precision = tp / (prp + 1e-7)
+    return precision
+    
 def combine_history(history1, history2):
     history = history1
     for key in history1.history:
