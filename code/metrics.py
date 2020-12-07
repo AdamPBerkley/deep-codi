@@ -47,7 +47,7 @@ def precision(y_true, y_pred):
     """
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     prp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
-    precision = tp / (prp + 1e-7)
+    precision = true_positives / (prp + 1e-7)
     return precision
     
 def sensitivity(y_true, y_pred):
