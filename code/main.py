@@ -3,17 +3,31 @@ import tensorflow as tf
 import os
 import pandas as pd
 
+from tensorflow.keras.callbacks import Callback
 from balanced_gen import BalancedDataGenerator
 from metrics import *
-
+import metrics
 
 from preprocess import get_data_main
 from PIL import Image
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', choices = ['train','test'],default = 'train')
+parser.add_argument('--weights',type=str,default = None)
+args = parser.parse_args()
 
 
-
+        
 def train(model,train_data,train_labels):
- #Create Training Data Generator for augmentation
+    """
+    Trains the model
+    :param train_data: The training data returned by preprocessing.get_data()
+    :param train_labels: The training labels returned by preprocessing.get_data()
+    
+    Augmentation is performed due to an imbalanced dataset. The data is oversampled and augmented utilizing the datagen params and balanced_gen.py
+    """
+    #Create Training Data Generator for augmentation
     CSVLogger = tf.keras.callbacks.CSVLogger('train_logs.csv',separator=",")
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         width_shift_range=0.1,
@@ -55,8 +69,12 @@ def train(model,train_data,train_labels):
      
     
 def test(model,test_path):
+    """
+    Tests the model
+    :param test_path: The path to the test data
+    """
     seed = 1
-    CSVLogger = tf.keras.callbacks.CSVLogger('test_logs.csv',separator=",")
+
     #Create Test Generator
     testing_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         preprocessing_function=tf.keras.applications.vgg16.preprocess_input
@@ -72,7 +90,7 @@ def test(model,test_path):
     test_steps = testing_generator.n//testing_generator.batch_size
     
     model.evaluate_generator(testing_generator,
-    steps=test_steps, callbacks = [CSVLogger],
+    steps=test_steps,
     verbose=1)        
 
     
@@ -80,8 +98,17 @@ def test(model,test_path):
   
     
 def main():
+    """
+    To run in testing mode, include following args:
+    --mode test
+    --weights path_to_weights + filename
+    
+    ex: python main.py --mode test --weights weights.10-0.09.hdf5
+    """
     train_path = '../data/main_dataset/train/'
     test_path ='../data/main_dataset/test/'
+    
+
     print("Loading the data...")
     
     #Load Training Data
@@ -100,19 +127,22 @@ def main():
     model.add(tf.keras.layers.Dense(1,activation = 'sigmoid'))
     model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
     model.summary()
-    
-    
+        
+        
 
-
-    print("Training...")
-    train(model,train_data,train_labels)    
-    model.save("../models/")
-    
-    print("Testing...")
-    test(model,test_path)
+    if args.mode == 'train':
+        print("Training...")
+        train(model,train_data,train_labels)    
+        model.save("../models/")
+    else:
+        print("Loading Weights...")
+        model.load_weights(arg.weights)
+        print("Testing...")
+        test(model,test_path)
 
 
 
 
 if __name__ == '__main__':
     main()
+

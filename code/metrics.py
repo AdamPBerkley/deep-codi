@@ -78,7 +78,9 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
     weighted_true = tf.gather(weights, y_true_max)
     loss = tf.keras.metrics.categorical_crossentropy(y_pred, y_true) * weighted_true
     return loss 
+    
 
+        
 if __name__ == '__main__':
     true = np.array([[1,0],[0,1]])
     pred = np.array([[0.9,0.1],[0,1]])
