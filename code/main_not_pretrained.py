@@ -84,10 +84,13 @@ def test(model, test_inputs, test_labels):
     the for loop it runs the batches on doesnt get predictions for the remainder"""
 
     dice = dice_coef(test_labels, all_logits)
-    sensitivity_val = sensitivity(test_labels, all_logits)
-    specificity_val = specificity(test_labels, all_logits)
+    y_true = tf.argmax(test_labels, axis=-1)
+    y_pred = tf.argmax(all_logits, axis=-1)
+    sensitivity_val = sensitivity(y_true, y_pred)
+    specificity_val = specificity(y_true, y_pred)
+    precision_val = precision(y_true, y_pred)
 
-    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy(), precision(test_labels, all_logits).numpy()
+    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy(), precision_val.numpy()
 
 
 def main():    

@@ -99,6 +99,8 @@ class PseudoVGG(tf.keras.Model):
         #tf.keras.losses.categorical_crossentropy(y_true, y_pred)
         return crossentropy 
         #tried all the below with reduce mean instead of reduce sum
+        #but need to take argmax first for all but dice 
+        #(as they dont take in one-hot encoded inputs)
         #- dice_coef(y_true, y_pred)
         #- sensitivity(y_true, y_pred)
         #- specificity(y_true, y_pred)

@@ -21,22 +21,13 @@ def dice_coef(y_true, y_pred, smooth=1e-10):
 
 def specificity(y_true, y_pred):
     """
-    :param y_true:Tensor - shape (batch_size, 2)
-        Truth labels one hot encoded
-    :param y_pred:Tensor - shape (batch_size, 2)
-        prediction value probabilities 
+    :param y_true:Tensor - shape (batch_size)
+        Truth labels (not one hot encoded)
+    :param y_pred:Tensor - shape (batch_size)
+        predicted values
     :return: Tensor - single float value in range [0,1]
         specificity value TN/(TN+FP)
     """
-    # m = tf.keras.metrics.FalsePositives(threshold)
-    # m.update_state(y_true,y_pred)
-    # fp = m.result().numpy()
-
-    # n = tf.keras.metrics.TrueNegatives(threshold)
-    # n.update_state(y_true,y_pred)
-    # tn = m.result().numpy()
-    y_true = tf.argmax(y_true, axis=-1)
-    y_pred = tf.argmax(y_pred, axis=-1)
     true_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1))), tf.float32)
     possible_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1))), tf.float32)
     
@@ -47,26 +38,24 @@ def specificity(y_true, y_pred):
 
 def precision(y_true, y_pred):
     """
-    :param y_true:Tensor - shape (batch_size, 2)
-        Truth labels one hot encoded
-    :param y_pred:Tensor - shape (batch_size, 2)
-        prediction value probabilities 
+    :param y_true:Tensor - shape (batch_size)
+        Truth labels 
+    :param y_pred:Tensor - shape (batch_size)
+        predicted labels
     :return: Tensor - single float value in range [0,1]
         precision value TP/(TP+FP)
     """
-    y_true = tf.argmax(y_true, axis=-1)
-    y_pred = tf.argmax(y_pred, axis=-1)
-    tp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
+    true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     prp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
     precision = tp / (prp + 1e-7)
     return precision
     
 def sensitivity(y_true, y_pred):
     """
-    :param y_true:Tensor - shape (batch_size, 2)
-        Truth labels one hot encoded
-    :param y_pred:Tensor - shape (batch_size, 2)
-        prediction value probabilities 
+    :param y_true:Tensor - shape (batch_size)
+        Truth labels
+    :param y_pred:Tensor - shape (batch_size)
+        predicted labels
     :return: Tensor - single float value in range [0,1]
         sensitivity value TP/(TP+FN)
     """
@@ -77,8 +66,6 @@ def sensitivity(y_true, y_pred):
     # n = tf.keras.metrics.TruePositives(threshold)
     # n.update_state(y_true,y_pred)
     # tp = m.result().numpy()
-    y_true = tf.argmax(y_true, axis=-1)
-    y_pred = tf.argmax(y_pred, axis=-1)
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     possible_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
 

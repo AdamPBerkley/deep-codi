@@ -51,7 +51,7 @@ def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
     return balanced_gen
 
 
-def get_data_main(path, imsize=224, oversample=1, color='L', normalize=True):
+def get_data_main(path, imsize=224, oversample=1, color='RGB', normalize=True):
     """
     Given a file path, returns an array of normalized inputs (images) and an array of 
     one_hot encoded binary labels. 
@@ -73,11 +73,11 @@ def get_data_main(path, imsize=224, oversample=1, color='L', normalize=True):
         a array containing the input images of desired size and type and 
         an array containing the labels one-hot encoded
      """
-    covid_pics = glob.glob(path+"covid/*")
+    covid_pics = glob.glob(path+"1_covid/*")
     if 'test' in path:
-        non_covid_pics = glob.glob(path+"non/**/*")
+        non_covid_pics = glob.glob(path+"0_non/**/*")
     else:
-        non_covid_pics = glob.glob(path+"non/*")
+        non_covid_pics = glob.glob(path+"0_non/*")
     num_pics = len(covid_pics)*oversample+len(non_covid_pics)
     if color == 'L':
         data = np.empty((num_pics, imsize, imsize, 1))
