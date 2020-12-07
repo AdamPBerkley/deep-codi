@@ -36,17 +36,23 @@ def train(model,train_data,train_labels):
         mode='min',
         patience=5
         )
-
+        
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath='weights.{epoch:02d}-{loss:.2f}.hdf5',
+        save_weights_only=True,
+        save_freq = 'epoch',
+        monitor='loss',
+        mode='min',
+        save_best_only=True)
         
     #Fit Model
     model.fit_generator(
         balanced_gen,
         steps_per_epoch=train_steps,
-        epochs=50,
-        callbacks=[early_stopping,CSVLogger]
+        epochs=10,
+        callbacks=[early_stopping,checkpoint_callback,CSVLogger]
         )   
      
-    print(results)
     
 def test(model,test_path):
     seed = 1
@@ -66,7 +72,7 @@ def test(model,test_path):
     test_steps = testing_generator.n//testing_generator.batch_size
     
     model.evaluate_generator(testing_generator,
-    steps=test_steps, metrics = [CSVLogger],
+    steps=test_steps, callbacks = [CSVLogger],
     verbose=1)        
 
     
@@ -100,13 +106,13 @@ def main():
 
     print("Training...")
     train(model,train_data,train_labels)    
-
+    model.save("../models/")
     
     print("Testing...")
     test(model,test_path)
 
 
 
-    model.save("../models/")
+
 if __name__ == '__main__':
     main()

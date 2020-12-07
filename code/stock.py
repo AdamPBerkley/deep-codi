@@ -20,7 +20,7 @@ def train(model,train_data,train_labels):
         height_shift_range=0.1,
         shear_range=0.1,
         brightness_range=[0.5, 1.25],
-        preprocessing_function=tf.keras.applications.vgg16.preprocess_input
+        preprocessing_function= tf.keras.applications.vgg16.preprocess_input
         )
         
     seed = 1
@@ -36,14 +36,20 @@ def train(model,train_data,train_labels):
         mode='min',
         patience=5
         )
-
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath='weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+        save_weights_only=True,
+        save_freq = 'epoch',
+        monitor='loss',
+        mode='min',
+        save_best_only=True)
         
     #Fit Model
     model.fit_generator(
         balanced_gen,
         steps_per_epoch=train_steps,
         epochs=50,
-        callbacks=[early_stopping,CSVLogger]
+        callbacks=[early_stopping,checkpoint_callback,CSVLogger]
         )   
      
     print(results)
