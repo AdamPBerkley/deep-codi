@@ -9,6 +9,10 @@ from balanced_gen import BalancedDataGenerator
 
 def normalize_image(image):
     image = image/np.max(image)
+    #dividing by 255 is technically more correct for image normalizations
+    #but runs into problems if you accidentally double normalize so we 
+    #kept it the other way
+    #image = image/255.0
     return image
 
 
@@ -29,7 +33,7 @@ def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
         by integers indexing (i.e. generator[0] returns the first batch of inputs 
         and labels)
     """
-    inputs, labels =  get_data_main(path, imsize=imsize, color=color)
+    inputs, labels =  get_data_main(path, imsize=imsize, color=color, normalize=False)
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rotation_range=15,
         width_shift_range=0.1,
@@ -47,7 +51,7 @@ def get_balanced_data(path, imsize=224, batch_size=32, color='L'):
     return balanced_gen
 
 
-def get_data_main(path, imsize=224, oversample=1, color='L'):
+def get_data_main(path, imsize=224, oversample=1, color='L', normalize=True):
     """
     Given a file path, returns an array of normalized inputs (images) and an array of 
     one_hot encoded binary labels. 
@@ -62,6 +66,9 @@ def get_data_main(path, imsize=224, oversample=1, color='L'):
     :param color: Stinge of values 'L' or 'RGB'
         color type of input image. L is black and white with 1 channel 
         and 'RGB' is color with 3 channels
+    :param normalize: Boolean
+        whether or not to run normalization. If running into BalancedDataGen
+        it takes care of that for you, so you don't to double normalize
     :return: Numpy Array, Numpy Array
         a array containing the input images of desired size and type and 
         an array containing the labels one-hot encoded
@@ -83,18 +90,24 @@ def get_data_main(path, imsize=224, oversample=1, color='L'):
             image = Image.open(pic).resize((imsize,imsize)).convert(color)
             im_data = np.asarray(image)
             if color == 'L':
-                data[index] = np.expand_dims(normalize_image(im_data), -1)
+                if normalize:
+                    data[index] = np.expand_dims(normalize_image(im_data), -1)
+                else:
+                    data[index] = np.expand_dims(im_data, -1)
             else:
-                data[index] = normalize_image(im_data)
+                data[index] = normalize_image(im_data) if normalize else im_data
             labels[index,1] = 1
             index += 1
     for pic in non_covid_pics:
         image = Image.open(pic).resize((imsize,imsize)).convert(color)
         im_data = np.asarray(image)
         if color == 'L':
-            data[index] = np.expand_dims(normalize_image(im_data), -1)
+            if normalize:
+                data[index] = np.expand_dims(normalize_image(im_data), -1)
+            else:
+                data[index] = np.expand_dims(im_data, -1)
         else:
-            data[index] = normalize_image(im_data)
+            data[index] = normalize_image(im_data) if normalize else im_data
         labels[index,0] = 1
         index += 1
 
