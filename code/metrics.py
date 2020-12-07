@@ -1,8 +1,6 @@
 import tensorflow as tf
 import numpy as np
 
-
-
 def dice_coef(y_true, y_pred, smooth=1e-10):
     """
     dice_coef =  2*TP/(|pred|+|true|)
@@ -73,6 +71,7 @@ def sensitivity(y_true, y_pred):
     
     return sensitivity
 
+
 def w_categorical_crossentropy(y_true, y_pred, weights):
     """https://www.programcreek.com/python/example/93764/keras.backend.categorical_crossentropy
     Keras-style categorical crossentropy loss function, with weighting for each class.
@@ -99,5 +98,4 @@ if __name__ == '__main__':
     pred = np.array([[0.9,0.1],[0,1]])
     print(specifictiy(true, pred))
     print(sensitivity(true,pred))
-
 

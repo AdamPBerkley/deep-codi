@@ -8,6 +8,8 @@ from imblearn.keras import balanced_batch_generator
 """
 Arnaldo Gualberto
 https://medium.com/analytics-vidhya/how-to-apply-data-augmentation-to-deal-with-unbalanced-datasets-in-20-lines-of-code-ada8521320c9
+
+Used to help balance unbalanced dataset through RandomOverSampling
 """
 
 class BalancedDataGenerator(Sequence):

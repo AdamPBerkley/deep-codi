@@ -9,9 +9,9 @@ from balanced_gen import BalancedDataGenerator
 
 def normalize_image(image):
     image = image/np.max(image)
-    #dividing by 255 is technically more correct for image normalizations
-    #but runs into problems if you accidentally double normalize so we 
-    #kept it the other way
+    """dividing by 255 (max value possible) is technically more correct 
+    for image normalizations but runs into problems if you accidentally 
+    double normalize so we kept it the other way"""
     #image = image/255.0
     return image
 
@@ -109,7 +109,6 @@ def get_data_main(path, imsize=224, oversample=1, color='RGB', normalize=True):
         else:
             data[index] = normalize_image(im_data) if normalize else im_data
         labels[index,0] = 1
-        index += 1
 
     return data, labels
 
