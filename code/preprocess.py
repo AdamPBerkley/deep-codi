@@ -109,6 +109,7 @@ def get_data_main(path, imsize=224, oversample=1, color='RGB', normalize=True):
         else:
             data[index] = normalize_image(im_data) if normalize else im_data
         labels[index,0] = 1
+        index += 1
 
     return data, labels
 

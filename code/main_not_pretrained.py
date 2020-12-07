@@ -101,7 +101,7 @@ def main():
     train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size, color=model.color)
     test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1, color=model.color)#30 for even
 
-    num_epochs = 1#model.epochs
+    num_epochs = model.epochs
     percent = 0
     losses = []
     for epoch in range(num_epochs):
