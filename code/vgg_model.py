@@ -10,7 +10,7 @@ class PseudoVGG(tf.keras.Model):
     def __init__(self):
         super(PseudoVGG, self).__init__()
         #Hyperparams
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
         self.batch_size = 32
         self.epochs = 15
         self.color = 'RGB' #should be 'RGB' or 'L'
