@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import os
-import pandas as pd
+
 
 from tensorflow.keras.callbacks import Callback
 from balanced_gen import BalancedDataGenerator
@@ -120,13 +120,20 @@ def main():
     vgg16 = tf.keras.applications.VGG16(input_shape=shape, include_top=False, weights='imagenet')
     vgg16.trainable=False
     
+    sensitivity_15 = tf.keras.metrics.Recall(.15,class_id = 1,name = "sensitivity_15")
+    sensitivity_3 = tf.keras.metrics.Recall(.3,class_id = 1,name = "sensitivity_3")
+    sensitivity_5 = tf.keras.metrics.Recall(.5,class_id = 1,name = "sensitivity_5")
+    
+    specificity_15 = tf.keras.metrics.Recall(.15,class_id = 0,name = "specificity_15")
+    specificity_3 = tf.keras.metrics.Recall(.3,class_id = 0,name = "specificity_3")
+    specificity_5 = tf.keras.metrics.Recall(.5,class_id = 0,name = "specificity_5")  
+    
     model = tf.keras.Sequential()
     model.add(vgg16)
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dropout(0.3))
     model.add(tf.keras.layers.Dense(1,activation = 'softmax'))
-    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
-    model.summary()
+    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True, metrics=[dice_coef,sensitivity_15,sensitivity_3,sensitivity_5,specificity_15,specificity_3,specificity_5,tf.keras.metrics.Precision()])model.summary()
         
         
 

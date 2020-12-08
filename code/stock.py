@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 import os
-import pandas as pd
 
 from tensorflow.keras.applications.vgg16 import preprocess_input,decode_predictions
 from tensorflow.keras.callbacks import Callback
@@ -19,8 +18,6 @@ parser.add_argument('--weights',type=str,default = None)
 args = parser.parse_args()
 
 
-
-        
 def train(model,train_data,train_labels):
     """
     Trains the model
@@ -116,17 +113,24 @@ def main():
     #Load Training Data
     train_data, train_labels = get_data_main(train_path)
     print(len(train_data),len(train_labels))
- 
+    sensitivity_15 = tf.keras.metrics.Recall(.15,class_id = 1,name = "sensitivity_15")
+    sensitivity_3 = tf.keras.metrics.Recall(.3,class_id = 1,name = "sensitivity_3")
+    sensitivity_5 = tf.keras.metrics.Recall(.5,class_id = 1,name = "sensitivity_5")
+    
+    specificity_15 = tf.keras.metrics.Recall(.15,class_id = 0,name = "specificity_15")
+    specificity_3 = tf.keras.metrics.Recall(.3,class_id = 0,name = "specificity_3")
+    specificity_5 = tf.keras.metrics.Recall(.5,class_id = 0,name = "specificity_5")   
+    
     print("Generating the model...")
     shape = (224, 224, 3)
     model = tf.keras.applications.VGG16(input_shape=shape, include_top=True,weights = None,classes = 2)
-    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True, metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
+    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True, metrics=[dice_coef,sensitivity_15,sensitivity_3,sensitivity_5,specificity_15,specificity_3,specificity_5,tf.keras.metrics.Precision()])
     model.summary()
      
      
      
      
-    # #What does VGG16 think these are with it's own classifiers 
+    # #What does VGG16 think these are with its own classifiers 
     # test_data, _ = get_data_main(train_path)
     # test_data = np.expand_dims(test_data[0], axis=0)
     # test_data =  preprocess_input(test_data)
