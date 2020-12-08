@@ -27,20 +27,16 @@ def specificity(y_true, y_pred, threshold=0.5):
     :return: Tensor - single float value in range [0,1]
         specificity value TN/(TN+FP)
     """
-    m = tf.keras.metrics.TrueNegatives(thresholds=threshold)
+    m = tf.keras.metrics.Precision(thresholds=threshold, class_id=0)
     m.update_state(y_true,y_pred)
-    true_negatives = m.result().numpy()
-
-    n = tf.keras.metrics.FalsePositives(thresholds=threshold)
-    n.update_state(y_true,y_pred)
-    false_positives = m.result().numpy()
-    possible_negatives = false_positives + true_negatives
+    specificity = m.result().numpy()
 
     """Differentiable version for using with loss in training
     true_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1))), tf.float32)
     possible_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1))), tf.float32)
-    """
     specificity = true_negatives / (possible_negatives + 1.0e-7)
+    """
+    
     
     
     return specificity
@@ -77,7 +73,7 @@ def sensitivity(y_true, y_pred, threshold=0.5):
         sensitivity value TP/(TP+FN)
     """
 
-    m = tf.keras.metrics.Recall(thresholds=threshold)
+    m = tf.keras.metrics.Recall(thresholds=threshold, class_id=1)
     m.update_state(y_true,y_pred)
     sensitivity = m.result().numpy()
     
