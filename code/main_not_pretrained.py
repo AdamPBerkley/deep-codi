@@ -49,7 +49,7 @@ def train(model, generator, verbose=False):
             loss = model.loss_function(labels, logits)
         if i % 4 == 0 and verbose:
             y_true = tf.argmax(labels, axis=-1)
-            y_pred = tf.argmax(logits, axis=-1)
+            y_pred = logits#tf.argmax(logits, axis=-1)
             sensitivity_val = sensitivity(y_true, y_pred)
             specificity_val = specificity(y_true, y_pred)
             precision_val = precision(y_true, y_pred)

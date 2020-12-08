@@ -55,20 +55,15 @@ def precision(y_true, y_pred, threshold=0.5):
     :return: Tensor - single float value in range [0,1]
         precision value TP/(TP+FP)
     """
-    m = tf.keras.metrics.FalsePositives(thresholds=threshold)
+    m = tf.keras.metrics.Precision(thresholds=threshold)
     m.update_state(y_true,y_pred)
-    false_positives = m.result().numpy()
-
-    n = tf.keras.metrics.TruePositives(thresholds=threshold)
-    n.update_state(y_true,y_pred)
-    true_positives = m.result().numpy()
-    prp = false_positives + true_positives
+    precision = m.result().numpy()
 
     """Differentiable version for using with loss in training
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     prp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
-    """
     precision = true_positives / (prp + 1e-7)
+    """
 
     return precision
     
@@ -81,21 +76,16 @@ def sensitivity(y_true, y_pred, threshold=0.5):
     :return: Tensor - single float value in range [0,1]
         sensitivity value TP/(TP+FN)
     """
-    m = tf.keras.metrics.FalseNegatives(thresholds=threshold)
-    m.update_state(y_true,y_pred)
-    false_negatives = m.result().numpy()
 
-    n = tf.keras.metrics.TruePositives(thresholds=threshold)
-    n.update_state(y_true,y_pred)
-    true_positives = m.result().numpy()
-    possible_positives = false_negatives + true_positives
+    m = tf.keras.metrics.Recall(thresholds=threshold)
+    m.update_state(y_true,y_pred)
+    sensitivity = m.result().numpy()
     
     """Differentiable version for using with loss in training
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     possible_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
-    """
     sensitivity = true_positives / (possible_positives + 1.0e-7)
-    
+    """
     return sensitivity
 
 
