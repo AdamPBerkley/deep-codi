@@ -48,8 +48,16 @@ def train(model, generator, verbose=False):
             logits = model(images)
             loss = model.loss_function(labels, logits)
             if i//BATCH_SZ % 4 == 0 and verbose:
+                y_true = tf.argmax(labels, axis=-1)
+                y_pred = tf.argmax(logits, axis=-1)
+                sensitivity_val = sensitivity(y_true, y_pred)
+                specificity_val = specificity(y_true, y_pred)
+                precision_val = precision(y_true, y_pred)
                 train_dice = dice_coef(labels, logits)
                 print("DICE score on training batch after {} training steps: {}".format(i, train_dice))
+                print("Sensitivity: {},   Specificity: {},   Precision: {}".format(sensitivity_val, 
+                    specificity_val, precision_val)
+                )
 
         loss_list.append(loss)
         gradients = tape.gradient(loss, model.trainable_variables)
