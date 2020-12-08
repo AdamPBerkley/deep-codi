@@ -113,13 +113,13 @@ def main():
     #Load Training Data
     train_data, train_labels = get_data_main(train_path)
     print(len(train_data),len(train_labels))
-    sensitivity_15 = tf.keras.metrics.Recall(.15,class_id = 1)
-    sensitivity_3 = tf.keras.metrics.Recall(.3,class_id = 1)
-    sensitivity_5 = tf.keras.metrics.Recall(.5,class_id = 1)
+    sensitivity_15 = tf.keras.metrics.Recall(.15,class_id = 1,name = "sensitivity_15")
+    sensitivity_3 = tf.keras.metrics.Recall(.3,class_id = 1,name = "sensitivity_3")
+    sensitivity_5 = tf.keras.metrics.Recall(.5,class_id = 1,name = "sensitivity_5")
     
-    specificity_15 = tf.keras.metrics.Recall(.15,class_id = 0)
-    specificity_3 = tf.keras.metrics.Recall(.3,class_id = 0)
-    specificity_5 = tf.keras.metrics.Recall(.5,class_id = 0)  
+    specificity_15 = tf.keras.metrics.Recall(.15,class_id = 0,name = "specificity_15")
+    specificity_3 = tf.keras.metrics.Recall(.3,class_id = 0,name = "specificity_3")
+    specificity_5 = tf.keras.metrics.Recall(.5,class_id = 0,name = "specificity_5")   
     
     print("Generating the model...")
     shape = (224, 224, 3)
