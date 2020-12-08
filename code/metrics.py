@@ -124,6 +124,6 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
 if __name__ == '__main__':
     true = np.array([[1,0],[0,1]])
     pred = np.array([[0.9,0.1],[0,1]])
-    print(specifictiy(true, pred))
+    print(specificity(true, pred))
     print(sensitivity(true,pred))
 
