@@ -17,7 +17,7 @@ def dice_coef(y_true, y_pred, smooth=1e-10):
     y_pred_f = tf.keras.backend.flatten(tf.cast(y_pred, 'float32'))
     return (2. * tf.reduce_sum(y_true_f * y_pred_f)) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
 
-def specificity(y_true, y_pred):
+def specificity(y_true, y_pred, threshold=0.5):
     """
     :param y_true:Tensor - shape (batch_size)
         Truth labels (not one hot encoded)
@@ -26,15 +26,26 @@ def specificity(y_true, y_pred):
     :return: Tensor - single float value in range [0,1]
         specificity value TN/(TN+FP)
     """
+    m = tf.keras.metrics.TrueNegatives(thresholds=threshold)
+    m.update_state(y_true,y_pred)
+    true_negatives = m.result().numpy()
+
+    n = tf.keras.metrics.FalsePositives(thresholds=threshold)
+    n.update_state(y_true,y_pred)
+    false_positives = m.result().numpy()
+    possible_negatives = false_positives + true_negatives
+
+    """Differentiable version for using with loss in training
     true_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value((1 - y_true) * (1 - y_pred), 0, 1))), tf.float32)
     possible_negatives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(1 - y_true, 0, 1))), tf.float32)
-    
+    """
     specificity = true_negatives / (possible_negatives + 1.0e-7)
+    
     
     return specificity
 
 
-def precision(y_true, y_pred):
+def precision(y_true, y_pred, threshold=0.5):
     """
     :param y_true:Tensor - shape (batch_size)
         Truth labels 
@@ -43,12 +54,24 @@ def precision(y_true, y_pred):
     :return: Tensor - single float value in range [0,1]
         precision value TP/(TP+FP)
     """
+    m = tf.keras.metrics.FalsePositives(thresholds=threshold)
+    m.update_state(y_true,y_pred)
+    false_positives = m.result().numpy()
+
+    n = tf.keras.metrics.TruePositives(thresholds=threshold)
+    n.update_state(y_true,y_pred)
+    true_positives = m.result().numpy()
+    prp = false_positives + true_positives
+
+    """Differentiable version for using with loss in training
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     prp = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
+    """
     precision = true_positives / (prp + 1e-7)
+
     return precision
     
-def sensitivity(y_true, y_pred):
+def sensitivity(y_true, y_pred, threshold=0.5):
     """
     :param y_true:Tensor - shape (batch_size)
         Truth labels
@@ -57,16 +80,19 @@ def sensitivity(y_true, y_pred):
     :return: Tensor - single float value in range [0,1]
         sensitivity value TP/(TP+FN)
     """
-    # m = tf.keras.metrics.FalseNegatives(threshold)
-    # m.update_state(y_true,y_pred)
-    # fn = m.result().numpy()
+    m = tf.keras.metrics.FalseNegatives(thresholds=threshold)
+    m.update_state(y_true,y_pred)
+    false_negatives = m.result().numpy()
 
-    # n = tf.keras.metrics.TruePositives(threshold)
-    # n.update_state(y_true,y_pred)
-    # tp = m.result().numpy()
+    n = tf.keras.metrics.TruePositives(thresholds=threshold)
+    n.update_state(y_true,y_pred)
+    true_positives = m.result().numpy()
+    possible_positives = false_negatives + true_positives
+    
+    """Differentiable version for using with loss in training
     true_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true * y_pred, 0, 1))), tf.float32)
     possible_positives = tf.cast(tf.reduce_sum(tf.round(tf.clip_by_value(y_true, 0, 1))), tf.float32)
-
+    """
     sensitivity = true_positives / (possible_positives + 1.0e-7)
     
     return sensitivity
