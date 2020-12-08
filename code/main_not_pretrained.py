@@ -53,7 +53,7 @@ def train(model, generator, verbose=False):
             precision_val = precision(labels, logits)
             train_dice = dice_coef(labels, logits)
             print("Scores on training batch after {} training steps".format(i))
-            print("Sensitivity: {}, Specificity: {}".format(sensitivity_val, specificity_val))
+            print("Sensitivity1: {}, Specificity: {}".format(sensitivity_val, specificity_val))
             print("Precision: {}, DICE: {}\n".format(precision_val, train_dice))
 
         loss_list.append(loss)
@@ -71,7 +71,7 @@ def test(model, test_inputs, test_labels):
     :param test_labels: Numpy Array - shape (num_images, 2)
         ground truth labels one-hot encoded
     :return: float, float, float, float 
-        returns dice score, sensitivity value, specificity value, 
+        returns dice score, sensitivity value (0.5 threshold), specificity value (0.5 threshold), 
         and precision value all of which are in the range [0,1]
     """
     BATCH_SZ = model.batch_size
@@ -87,15 +87,21 @@ def test(model, test_inputs, test_labels):
     
     """this should break if the dataset size isnt divisible by the batch size because
     the for loop it runs the batches on doesnt get predictions for the remainder"""
+    sensitivity_val1 = sensitivity(test_labels, all_logits, threshold=0.15)
+    sensitivity_val2 = sensitivity(test_labels, all_logits, threshold=0.3)
+    sensitivity_val3 = sensitivity(test_labels, all_logits, threshold=0.5)
+    specificity_val1 = specificity(test_labels, all_logits, threshold=0.15)
+    specificity_val2 = specificity(test_labels, all_logits, threshold=0.3)
+    specificity_val3 = specificity(test_labels, all_logits, threshold=0.5)
 
     dice = dice_coef(test_labels, all_logits)
-    y_true = tf.argmax(test_labels, axis=-1)
-    y_pred = tf.argmax(all_logits, axis=-1)
-    sensitivity_val = sensitivity(y_true, y_pred)
-    specificity_val = specificity(y_true, y_pred)
-    precision_val = precision(y_true, y_pred)
+    precision_val = precision(test_labels, all_logits)
+    print("Sensitivity 0.15: {}, Senstivity 0.3: {}, Senstivity 0.5: {}".format(sensitivity_val1,sensitivity_val2,sensitivity_val3))
+    print("Specificity 0.15: {}, Specificity 0.3: {}, Specificity 0.5: {}".format(specificity_val1, specificity_val2, specificity_val3))
+    print("DICE: {}, Precision: {}".format(dice, precision_val))
+    
 
-    return dice.numpy(), sensitivity_val.numpy(), specificity_val.numpy(), precision_val.numpy()
+    return dice.numpy(), sensitivity_val3, specificity_val3, precision_val
 
 
 def main():    
@@ -117,7 +123,7 @@ def main():
             percent = curr
             print("Completion: {0:.0f}%".format(percent))
     
-    print(test(model, test_data, test_labels))
+    test(model, test_data, test_labels)
     visualize_loss(losses)
 
 

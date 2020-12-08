@@ -12,7 +12,7 @@ class PseudoVGG(tf.keras.Model):
         #Hyperparams
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
         self.batch_size = 32
-        self.epochs = 15
+        self.epochs = 10
         self.color = 'RGB' #should be 'RGB' or 'L'
         kernel_size_1 = 3
         kernel_size_2 = 2

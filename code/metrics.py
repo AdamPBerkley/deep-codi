@@ -20,14 +20,14 @@ def dice_coef(y_true, y_pred, smooth=1e-10):
 
 def specificity(y_true, y_pred, threshold=0.5):
     """
-    :param y_true:Tensor - shape (batch_size)
-        Truth labels (not one hot encoded)
-    :param y_pred:Tensor - shape (batch_size)
-        predicted values
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction probabilities
     :return: Tensor - single float value in range [0,1]
         specificity value TN/(TN+FP)
     """
-    m = tf.keras.metrics.Precision(thresholds=threshold, class_id=0)
+    m = tf.keras.metrics.Recall(thresholds=threshold, class_id=0)
     m.update_state(y_true,y_pred)
     specificity = m.result().numpy()
 
@@ -37,17 +37,15 @@ def specificity(y_true, y_pred, threshold=0.5):
     specificity = true_negatives / (possible_negatives + 1.0e-7)
     """
     
-    
-    
     return specificity
 
 
 def precision(y_true, y_pred, threshold=0.5):
     """
-    :param y_true:Tensor - shape (batch_size)
-        Truth labels 
-    :param y_pred:Tensor - shape (batch_size)
-        predicted labels
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size ,2)
+        prediction probabilities
     :return: Tensor - single float value in range [0,1]
         precision value TP/(TP+FP)
     """
@@ -65,10 +63,10 @@ def precision(y_true, y_pred, threshold=0.5):
     
 def sensitivity(y_true, y_pred, threshold=0.5):
     """
-    :param y_true:Tensor - shape (batch_size)
-        Truth labels
-    :param y_pred:Tensor - shape (batch_size)
-        predicted labels
+    :param y_true:Tensor - shape (batch_size, 2)
+        Truth labels one hot encoded
+    :param y_pred:Tensor - shape (batch_size, 2)
+        prediction probabilities
     :return: Tensor - single float value in range [0,1]
         sensitivity value TP/(TP+FN)
     """
