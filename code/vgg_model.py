@@ -12,40 +12,40 @@ class PseudoVGG(tf.keras.Model):
         #Hyperparams
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
         self.batch_size = 32
-        self.epochs = 5
-        self.color = 'L' #should be 'RGB' or 'L'
+        self.epochs = 15
+        self.color = 'RGB' #should be 'RGB' or 'L'
         kernel_size_1 = 3
         kernel_size_2 = 2
         
 
         #Model Architecture
-        self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv1_2 = tf.keras.layers.Conv2D(64,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv1_1 = tf.keras.layers.Conv2D(64,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv1_2 = tf.keras.layers.Conv2D(64,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
         self.pool1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
         
-        self.conv2_1 = tf.keras.layers.Conv2D(128,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv2_2 = tf.keras.layers.Conv2D(128,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv2_1 = tf.keras.layers.Conv2D(128,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv2_2 = tf.keras.layers.Conv2D(128,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
         self.pool2 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
         
-        self.conv3_1 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv3_2 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv3_3 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv3_1 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv3_2 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv3_3 = tf.keras.layers.Conv2D(256,kernel_size_1,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
         self.pool3 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
             
-        self.conv4_1 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv4_2 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv4_3 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv4_1 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv4_2 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv4_3 = tf.keras.layers.Conv2D(512,kernel_size_2,activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
         self.pool4 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
             
-        self.conv5_1 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv5_2 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
-        self.conv5_3 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer="zeros")
+        self.conv5_1 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv5_2 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
+        self.conv5_3 = tf.keras.layers.Conv2D(512,kernel_size_2, activation='relu', padding='SAME',use_bias=True,bias_initializer='random_normal')
         self.pool5 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2),strides=(2, 2), padding='SAME')
         self.flatten = tf.keras.layers.Flatten()
             
-        self.dense6 = tf.keras.layers.Dense(4096, use_bias=True, activation='relu', bias_initializer="zeros")
-        self.dense7 = tf.keras.layers.Dense(1000, use_bias=True, activation='relu', bias_initializer="zeros")
-        self.dense8 = tf.keras.layers.Dense(2, use_bias=True, activation=None, bias_initializer="zeros")
+        self.dense6 = tf.keras.layers.Dense(4096, use_bias=True, activation='relu', bias_initializer='random_normal')
+        self.dense7 = tf.keras.layers.Dense(1000, use_bias=True, activation='relu', bias_initializer='random_normal')
+        self.dense8 = tf.keras.layers.Dense(2, use_bias=True, activation=None, bias_initializer='random_normal')
     
     def call(self, covid_input):
         """

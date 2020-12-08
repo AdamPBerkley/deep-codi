@@ -3,24 +3,40 @@ import tensorflow as tf
 import os
 import pandas as pd
 
+from tensorflow.keras.applications.vgg16 import preprocess_input,decode_predictions
+from tensorflow.keras.callbacks import Callback
 from balanced_gen import BalancedDataGenerator
 from metrics import *
-
+import metrics
 
 from preprocess import get_data_main
 from PIL import Image
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', choices = ['train','test'],default = 'train')
+parser.add_argument('--weights',type=str,default = None)
+args = parser.parse_args()
 
 
 
+        
 def train(model,train_data,train_labels):
- #Create Training Data Generator for augmentation
-    CSVLogger = tf.keras.callbacks.CSVLogger('train_logs.csv',separator=",")
+    """
+    Trains the model
+    :param train_data: The training data returned by preprocessing.get_data()
+    :param train_labels: The training labels returned by preprocessing.get_data()
+    
+    Augmentation is performed due to an imbalanced dataset. The data is oversampled and augmented utilizing the datagen params and balanced_gen.py
+    """
+    #Create Training Data Generator for augmentation
+    CSVLogger = tf.keras.callbacks.CSVLogger('../results/stock/train_logs.csv',separator=",")
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         width_shift_range=0.1,
         height_shift_range=0.1,
         shear_range=0.1,
         brightness_range=[0.5, 1.25],
-        preprocessing_function= tf.keras.applications.vgg16.preprocess_input
+        preprocessing_function=tf.keras.applications.vgg16.preprocess_input
         )
         
     seed = 1
@@ -36,8 +52,9 @@ def train(model,train_data,train_labels):
         mode='min',
         patience=5
         )
+        
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath='weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+        filepath='../weights/stock/weights.{epoch:02d}-{loss:.2f}.hdf5',
         save_weights_only=True,
         save_freq = 'epoch',
         monitor='loss',
@@ -48,15 +65,18 @@ def train(model,train_data,train_labels):
     model.fit_generator(
         balanced_gen,
         steps_per_epoch=train_steps,
-        epochs=50,
+        epochs=10,
         callbacks=[early_stopping,checkpoint_callback,CSVLogger]
         )   
      
-    print(results)
     
 def test(model,test_path):
+    """
+    Tests the model
+    :param test_path: The path to the test data
+    """
     seed = 1
-    CSVLogger = tf.keras.callbacks.CSVLogger('test_logs.csv',separator=",")
+
     #Create Test Generator
     testing_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         preprocessing_function=tf.keras.applications.vgg16.preprocess_input
@@ -66,13 +86,13 @@ def test(model,test_path):
         color_mode='rgb',
         target_size=(224,224),
         batch_size=32,
-        class_mode='binary',
+        class_mode='categorical',
         seed=seed
         ) 
     test_steps = testing_generator.n//testing_generator.batch_size
     
     model.evaluate_generator(testing_generator,
-    steps=test_steps, metrics = [CSVLogger],
+    steps=test_steps,
     verbose=1)        
 
     
@@ -80,8 +100,17 @@ def test(model,test_path):
   
     
 def main():
+    """
+    To run in testing mode, include following args:
+    --mode test
+    --weights path_to_weights + filename
+    
+    ex: python main.py --mode test --weights weights.10-0.09.hdf5
+    """
     train_path = '../data/main_dataset/train/'
     test_path ='../data/main_dataset/test/'
+    
+
     print("Loading the data...")
     
     #Load Training Data
@@ -90,24 +119,32 @@ def main():
  
     print("Generating the model...")
     shape = (224, 224, 3)
-    model = tf.keras.applications.VGG16(input_shape=shape, include_top=True, weights='imagenet')
-    model.trainable=False
-    
-    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
+    model = tf.keras.applications.VGG16(input_shape=shape, include_top=True,weights = None,classes = 2)
+    model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True, metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
     model.summary()
-    
-    
+     
+     
+     
+     
+    # #What does VGG16 think these are with it's own classifiers 
+    # test_data, _ = get_data_main(train_path)
+    # test_data = np.expand_dims(test_data[0], axis=0)
+    # test_data =  preprocess_input(test_data)
+    # preds = model.predict(test_data)
+    # decoded = decode_predictions(preds)
+    # print(decoded)
+    if args.mode == 'train':
+        print("Training...")
+        train(model,train_data,train_labels)    
+    else:
+        print("Loading Weights...")
+        model.load_weights(args.weights)
+        print("Testing...")
+        test(model,test_path)
 
 
-    print("Training...")
-    train(model,train_data,train_labels)    
-
-    
-    print("Testing...")
-    test(model,test_path)
 
 
-
-    model.save("../models/")
 if __name__ == '__main__':
     main()
+

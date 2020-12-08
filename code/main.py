@@ -52,7 +52,7 @@ def train(model,train_data,train_labels):
         )
         
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath='weights.{epoch:02d}-{loss:.2f}.hdf5',
+        filepath='../weights/VGG_Dense/weights.{epoch:02d}-{loss:.2f}.hdf5',
         save_weights_only=True,
         save_freq = 'epoch',
         monitor='loss',
@@ -84,7 +84,7 @@ def test(model,test_path):
         color_mode='rgb',
         target_size=(224,224),
         batch_size=32,
-        class_mode='binary',
+        class_mode='categorical',
         seed=seed
         ) 
     test_steps = testing_generator.n//testing_generator.batch_size
@@ -124,7 +124,7 @@ def main():
     model.add(vgg16)
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dropout(0.3))
-    model.add(tf.keras.layers.Dense(1,activation = 'sigmoid'))
+    model.add(tf.keras.layers.Dense(1,activation = 'softmax'))
     model.compile(optimizer=tf.optimizers.Adam(.0001), loss='binary_crossentropy',run_eagerly=True,metrics=["accuracy",sensitivity,specificity,precision,dice_coef])
     model.summary()
         
@@ -133,7 +133,6 @@ def main():
     if args.mode == 'train':
         print("Training...")
         train(model,train_data,train_labels)    
-        model.save("../models/")
     else:
         print("Loading Weights...")
         model.load_weights(arg.weights)
