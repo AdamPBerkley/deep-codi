@@ -112,6 +112,9 @@ def main():
     train_generator = get_balanced_data(path + 'train/', imsize=224, batch_size=model.batch_size, color=model.color)
     test_data, test_labels = get_data_main(path + 'test/', imsize=224, oversample=1, color=model.color)#30 for even
 
+    for i in range(test_data.shape[0]):
+        test_data[i] = tf.keras.applications.vgg16.preprocess_input(test_data[i])
+    
     num_epochs = model.epochs
     percent = 0
     losses = []
